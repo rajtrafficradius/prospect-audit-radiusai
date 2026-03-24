@@ -38,7 +38,8 @@ async def scrape_website_core_pages(base_url, output_dir=None):
         
         # Take screenshot for Vision Agent
         try:
-            await page.goto(base_url, wait_until="networkidle", timeout=30000)
+            await page.goto(base_url, wait_until="domcontentloaded", timeout=30000)
+            await page.wait_for_timeout(4000) # Give it 4 seconds to render images
             screenshot_path = os.path.join(output_dir, "homepage_screenshot.png")
             await page.screenshot(path=screenshot_path, full_page=True)
             print(f"Saved UI Screenshot: {screenshot_path}")
