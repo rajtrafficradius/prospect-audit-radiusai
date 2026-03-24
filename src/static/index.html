@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radius AI | Traffic Radius</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+    <!-- Deep Space Background with moving orbs -->
+    <div class="bg-universe">
+        <div class="nebula n1"></div>
+        <div class="nebula n2"></div>
+        <div class="nebula n3"></div>
+    </div>
+
+    <!-- Minimalist Nav -->
+    <nav class="glass-nav">
+        <div class="nav-brand">
+            <img src="/static/logo.png" alt="Traffic Radius" class="tr-logo">
+            <span class="nav-divider">/</span>
+            <div class="brand-orb"></div>
+            <span>Radius AI <b>v3.0</b></span>
+        </div>
+        <div class="nav-status">
+            <span class="status-dot"></span> Core Online
+        </div>
+    </nav>
+
+    <!-- Hero / Omnibar -->
+    <main class="hero-container" id="heroSection">
+        <div class="hero-center">
+            <div class="ai-greeting">
+                <div class="agent-avatar breathing"></div>
+                <h1>What would you like me to audit?</h1>
+            </div>
+            
+            <form id="auditForm" class="cyber-omnibar">
+                <div class="input-group">
+                    <i data-feather="globe"></i>
+                    <input type="text" id="domain" placeholder="example.com" required autocomplete="off" spellcheck="false">
+                </div>
+                <div class="divider"></div>
+                <div class="input-group">
+                    <i data-feather="briefcase"></i>
+                    <input type="text" id="company" placeholder="Prospect Name" required autocomplete="off" spellcheck="false">
+                </div>
+                <button type="submit" id="submitBtn" class="omnibar-submit">
+                    <i data-feather="corner-down-left"></i>
+                    <div class="spinner hidden" id="btnSpinner"></div>
+                </button>
+            </form>
+            
+            <p class="hero-hint">Entering a domain will deploy a 5-node agent swarm to analyze SEO, AEO, and GEO potential.</p>
+        </div>
+    </main>
+
+    <!-- Agent Workspace (Manus AI Style: 3 Panes) -->
+    <div class="workspace-grid hidden" id="workspace">
+        <!-- Left: Agent Monologue / Tasks -->
+        <aside class="panel glass-panel task-panel">
+            <div class="panel-header">
+                <i data-feather="cpu"></i>
+                <span>Task Stack</span>
+            </div>
+            <div class="panel-body">
+                <div class="active-focus">
+                    <span class="focus-label">CURRENT FOCUS</span>
+                    <h3 id="currentFocusText">Initializing Swarm...</h3>
+                </div>
+                
+                <ul class="node-tree">
+                    <li class="node-item pending" id="node-extraction">
+                        <div class="node-icon"><i data-feather="database"></i></div>
+                        <div class="node-details">
+                            <span class="node-name">Extraction Engine</span>
+                            <span class="node-status">Awaiting...</span>
+                        </div>
+                    </li>
+                    <li class="node-item pending" id="node-vision">
+                        <div class="node-icon"><i data-feather="eye"></i></div>
+                        <div class="node-details">
+                            <span class="node-name">Multimodal CRO</span>
+                            <span class="node-status">Awaiting...</span>
+                        </div>
+                    </li>
+                    <li class="node-item pending" id="node-market">
+                        <div class="node-icon"><i data-feather="bar-chart-2"></i></div>
+                        <div class="node-details">
+                            <span class="node-name">Market Intelligence</span>
+                            <span class="node-status">Awaiting...</span>
+                        </div>
+                    </li>
+                    <li class="node-item pending" id="node-rag">
+                        <div class="node-icon"><i data-feather="layers"></i></div>
+                        <div class="node-details">
+                            <span class="node-name">RAG Vector DB</span>
+                            <span class="node-status">Awaiting...</span>
+                        </div>
+                    </li>
+                    <li class="node-item pending" id="node-synthesis">
+                        <div class="node-icon"><i data-feather="edit-3"></i></div>
+                        <div class="node-details">
+                            <span class="node-name">Strategy Synthesis</span>
+                            <span class="node-status">Awaiting...</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </aside>
+
+        <!-- Center: The Canvas & Artifacts -->
+        <main class="panel center-canvas">
+            <div class="canvas-header">
+                <div class="target-badge">
+                    <div class="target-orb"></div>
+                    <span id="activeTargetDomain">domain.com</span>
+                </div>
+            </div>
+            
+            <div class="canvas-body" id="canvasBody">
+                <!-- Visualizations or live status will show here -->
+                <div class="agent-live-status" id="agentLiveStatus">
+                    <div id="centralOrb" class="giant-orb booting"></div>
+                    <h2 id="agentMainState">Agent deployed.</h2>
+                    <p id="agentSubState">Connecting to LangGraph orchestrator...</p>
+                </div>
+                
+                <!-- Deliverables Artifact (Hidden until done) -->
+                <div id="artifactVault" class="artifact-vault hidden">
+                    <div class="vault-success">
+                        <div class="success-ring"><i data-feather="check"></i></div>
+                        <h2>Audit Complete</h2>
+                        <p>Strategy synthesized and compiled.</p>
+                    </div>
+                    
+                    <div class="artifact-cards">
+                        <a href="#" id="dl-docx" target="_blank" class="artifact-card word-card">
+                            <div class="ac-icon"><i data-feather="file-text"></i></div>
+                            <div class="ac-text">
+                                <h4>Strategy Document</h4>
+                                <span>.docx</span>
+                            </div>
+                        </a>
+                        <a href="#" id="dl-xlsx" target="_blank" class="artifact-card excel-card">
+                            <div class="ac-icon"><i data-feather="grid"></i></div>
+                            <div class="ac-text">
+                                <h4>Action Plan</h4>
+                                <span>.xlsx</span>
+                            </div>
+                        </a>
+                        <a href="/output/charts/integrated_scorecard.png" target="_blank" class="artifact-card image-card">
+                            <div class="ac-icon"><i data-feather="pie-chart"></i></div>
+                            <div class="ac-text">
+                                <h4>Scorecard</h4>
+                                <span>.png</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Right: Developer Terminal -->
+        <aside class="panel glass-panel terminal-panel">
+            <div class="panel-header">
+                <i data-feather="terminal"></i>
+                <span>Agent strout</span>
+            </div>
+            <div class="terminal-window" id="terminalWindow">
+                <ul class="log-stream" id="logList"></ul>
+            </div>
+        </aside>
+    </div>
+
+    <script src="/static/app.js"></script>
+    <script>feather.replace();</script>
+</body>
+</html>
