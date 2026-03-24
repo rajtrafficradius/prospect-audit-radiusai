@@ -15,3 +15,5 @@ fastapi
 uvicorn
 python-multipart
 faiss-cpu
+aiohttp
+tiktoken
