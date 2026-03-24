@@ -11,3 +11,7 @@ openai>=1.10.0
 openpyxl>=3.1.2
 langgraph
 langchain-core
+fastapi
+uvicorn
+python-multipart
+faiss-cpu
