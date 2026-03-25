@@ -9,6 +9,7 @@ from scraper import run_scraper
 from llm_extractor import extract_business_info
 from vision_cro_agent import analyze_homepage_ui
 from semrush_client import gather_market_intelligence
+from intelligence_refinement import refine_intelligence
 from competitor_shadowing import run_competitor_shadowing
 import sys
 sys.path.append(os.path.join(os.path.dirname(__file__), "..", "scripts"))
@@ -115,6 +116,10 @@ def phase_2_market_intelligence(state: AuditState):
             blacklist_terms=blacklist, 
             database=state["target_country"]
         )
+        
+        # New: Contextual Intelligence Refinement (AI Audit)
+        mi = refine_intelligence(mi, ba)
+        
         with open(os.path.join(state["output_dir"], "market_intelligence.json"), "w") as f:
             json.dump(mi, f, indent=2)
         return {"market_intelligence": mi}

@@ -128,24 +128,14 @@ def gather_market_intelligence(domain: str, seed_keywords: List[str], brand_vari
     client = SemrushClient(api_key=api_key)
     print(f"Gathering Business-First Intelligence for {domain}...")
     
-    GLOBAL_BLACKLIST = [
-        "christmas", "xmas", "countdown", "days until", "how many days", 
-        "lyrics", "quote", "wiki", "meaning", "definition", "calculator", 
-        "converter", "news", "weather", "today", "tomorrow", "tonight"
-    ]
-
     def is_filtered(text: str, variations: List[str], blacklist: List[str]) -> bool:
         text_lower = text.lower()
         # Filter Branded
         for var in variations:
             if var.lower() in text_lower:
                 return True
-        # Filter Local Blacklist
+        # Filter Dynamic Blacklist (from LLM)
         for term in blacklist:
-            if term.lower() in text_lower:
-                return True
-        # Filter Global Blacklist
-        for term in GLOBAL_BLACKLIST:
             if term.lower() in text_lower:
                 return True
         return False

@@ -52,6 +52,7 @@ class BusinessAnalysis(BaseModel):
     seed_keywords: SeedKeywords
     unique_selling_points: List[str] = Field(default_factory=list)
     commercial_intent_focus: str = Field(description="A brief description of the core revenue-generating purpose of the site to guide competitor research.")
+    negative_exclusion_criteria: List[str] = Field(default_factory=list, description="Specific topics, page types, or intents that are NOT relevant to the core business (e.g., 'Holiday Countdowns', 'Generic Wiki content', 'Informational blogs about X').")
 
 # ---------------------------------------------------------
 # Extraction Logic
@@ -79,6 +80,7 @@ def extract_business_info(scraped_pages: List[dict], openai_api_key: Optional[st
         "Carefully analyze the provided website content scraped from the prospect's website.\n"
         "Your GOAL is to identify the 'Commercial Core'—what they actually SELL.\n"
         "IGNORE informational blogs, internal news, or incidental seasonal content (like countdowns) unless they are the primary product.\n"
+        "In 'negative_exclusion_criteria', list specific themes that should be stripped from the audit (e.g. if a furniture store has a christmas countdown, list 'Holiday/Seasonal Countdowns').\n"
         "Extract the required business intelligence and fill out the structured schema accurately.\n"
         "In 'seo_seeds', provide ONLY high-intent commercial keywords. ABSOLUTELY NO BRANDED TERMS.\n"
         "In 'competitor_blacklist_terms', identify terms that would indicate a non-commercial competitor (e.g., 'wiki', 'blog', 'news', 'countdown')."
