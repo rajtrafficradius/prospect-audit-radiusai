@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 
 # Load environment variables
 root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-load_dotenv(os.path.join(root_dir, ".env"))
+load_dotenv(os.path.join(root_dir, ".env"), override=False)
 
 class Slide(BaseModel):
     title: str

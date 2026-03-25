@@ -19,7 +19,6 @@ def analyze_homepage_ui(image_path: str) -> dict:
     Passes the full-page screenshot of the prospect to GPT-4o-Vision.
     Returns a structured assessment of conversion rate optimization gaps.
     """
-    load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
     client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
     
     if not os.path.exists(image_path):

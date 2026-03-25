@@ -9,7 +9,12 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
-load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"), override=False)
+key = os.environ.get("OPENAI_API_KEY", "")
+if key:
+    print(f" [+] API Key Loaded: {key[:10]}...{key[-4:]} (Length: {len(key)})")
+else:
+    print(" [!] WARNING: No OPENAI_API_KEY found in environment!")
 
 app = FastAPI(title="TrafficRadius Prospect Audit Generator")
 
@@ -181,7 +186,10 @@ async def download_file(job_id: str, file_type: str):
         if os.path.exists(archive_path):
             file_path = archive_path
         else:
+            print(f" [!] File not found for download: job_id={job_id}, type={file_type}, tried={session_dir} and {archive_path}")
             return JSONResponse({"error": "File not found"}, status_code=404)
+            
+    print(f" [+] Serving download: {file_path}")
         
     return FileResponse(
         path=file_path,

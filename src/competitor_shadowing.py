@@ -48,7 +48,6 @@ async def shadow_competitors_async(prospect_text: str, top_competitors: List[str
         
     print("Competitor data extracted. Synthesizing Gap Analysis with GPT-4o...")
     
-    load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
     client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
     
     prompt = f"""
