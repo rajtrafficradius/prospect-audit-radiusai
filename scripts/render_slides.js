@@ -27,49 +27,60 @@ async function renderSlides(sessionDir, outputDir) {
         const slide = slidesData[i];
         const slideNum = (i + 1).toString().padStart(2, '0');
         
-        // Simple string replacement for data injection
-        let html = templateHtml
-            .replace('id="title">Competitive Dominance', `id="title">${slide.title}`)
-            .replace('id="subtitle">MARKET INTELLIGENCE & GAP ANALYSIS', `id="subtitle">${slide.subtitle || ''}`)
-            .replace('id="quote">"Search is evolving from <strong>Links</strong> to <strong>Answers</strong>. This is your first-mover advantage."', `id="quote">${slide.quote || ''}`)
-            .replace('id="slide-num">SLIDE 01 OF 15', `id="slide-num">SLIDE ${slideNum} OF ${slidesData.length}`);
+        await page.setContent(templateHtml);
 
-        // Bullet points injection
-        const bulletHtml = (slide.bullets || []).map(b => 
-            `<li class="bullet-item"><div class="bullet-icon"></div><span>${b}</span></li>`
-        ).join('');
-        html = html.replace('<ul class="bullet-list" id="bullets">', `<ul class="bullet-list" id="bullets">${bulletHtml}`);
-        
-        // Remove the original placeholder bullets if they exist
-        html = html.replace(/<li class="bullet-item">[\s\S]*?<\/li>/g, '');
+        // Inject data via DOM manipulation - 100% reliable
+        await page.evaluate((data, sNum, sTotal) => {
+            const titleEl = document.getElementById('title');
+            const subtitleEl = document.getElementById('subtitle');
+            const quoteEl = document.getElementById('quote');
+            const slideNumEl = document.getElementById('slide-num');
+            const bulletList = document.getElementById('bullets');
+
+            if (titleEl) titleEl.innerText = data.title;
+            if (subtitleEl) subtitleEl.innerText = data.subtitle || '';
+            if (quoteEl) quoteEl.innerHTML = data.quote || '';
+            if (slideNumEl) slideNumEl.innerText = `SLIDE ${sNum} OF ${sTotal}`;
+
+            if (bulletList) {
+                bulletList.innerHTML = ''; // Clear placeholders
+                (data.bullets || []).forEach(b => {
+                    const li = document.createElement('li');
+                    li.className = 'bullet-item';
+                    li.innerHTML = `<div class="bullet-icon"></div><span>${b}</span>`;
+                    bulletList.appendChild(li);
+                });
+            }
+        }, slide, slideNum, slidesData.length);
 
         // Visual injection (Charts / Architecture)
         if (slide.visual) {
             let visualPath = "";
-            
-            // Priority 1: Check session directory (e.g. charts/)
             const sessionPath = path.join(sessionDir, slide.visual);
-            // Priority 2: Check project root (e.g. src/static/ppt_assets/)
-            const projectRoot = path.dirname(__dirname); // parent of scripts/
-            const rootPath = path.join(projectRoot, "src", slide.visual);
+            const projectRoot = path.dirname(__dirname);
+            const rootStaticPath = path.join(projectRoot, "src", "static", "ppt_assets", path.basename(slide.visual));
+            const rootLibPath = path.join(projectRoot, "src", slide.visual);
             
             if (fs.existsSync(sessionPath)) {
                 visualPath = sessionPath;
-            } else if (fs.existsSync(rootPath)) {
-                visualPath = rootPath;
+            } else if (fs.existsSync(rootStaticPath)) {
+                visualPath = rootStaticPath;
+            } else if (fs.existsSync(rootLibPath)) {
+                visualPath = rootLibPath;
             }
 
             if (visualPath && fs.existsSync(visualPath)) {
                 const base64Image = fs.readFileSync(visualPath).toString('base64');
-                html = html.replace('src="https://via.placeholder.com/800x600/1B2A4A/00CCFF?text=Data+Visualization"', `src="data:image/png;base64,${base64Image}"`);
+                await page.evaluate((b64) => {
+                    const img = document.getElementById('visual');
+                    if (img) img.src = `data:image/png;base64,${b64}`;
+                }, base64Image);
             } else {
                 console.warn(` [!] Warning: Visual not found: ${slide.visual}`);
             }
         }
 
-        await page.setContent(html);
         await page.waitForLoadState('networkidle');
-        
         const screenshotPath = path.join(outputDir, `slide_${slideNum}.png`);
         await page.screenshot({ path: screenshotPath, fullPage: true });
         console.log(` [+] Rendered slide ${slideNum}: ${screenshotPath}`);
