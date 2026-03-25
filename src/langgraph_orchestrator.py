@@ -95,9 +95,26 @@ def phase_2_market_intelligence(state: AuditState):
             # Fallback to company name
             seeds = [state["company_name"]]
             
-        print(f"Using deeply targetted seeds: {seeds[:3]}")
+        print(f"Using deeply targeted seeds: {seeds[:3]}")
         
-        mi = gather_market_intelligence(state["domain"], seeds, database=state["target_country"])
+        # Extract Brand Variations and Blacklist Terms for strict filtering
+        ba = state.get("business_analysis") or {}
+        entity = ba.get("entity_signals") or {}
+        brand_vars = entity.get("brand_name_variations") or []
+        blacklist = entity.get("competitor_blacklist_terms") or []
+        
+        # Ensure domain name is always in brand variations
+        clean_domain = state["domain"].replace("https://", "").replace("http://", "").split("/")[0]
+        if clean_domain not in brand_vars:
+            brand_vars.append(clean_domain)
+            
+        mi = gather_market_intelligence(
+            state["domain"], 
+            seeds, 
+            brand_variations=brand_vars, 
+            blacklist_terms=blacklist, 
+            database=state["target_country"]
+        )
         with open(os.path.join(state["output_dir"], "market_intelligence.json"), "w") as f:
             json.dump(mi, f, indent=2)
         return {"market_intelligence": mi}
@@ -210,6 +227,7 @@ def phase_6_deliverables(state: AuditState):
         subprocess.run([sys.executable, os.path.join(script_dir, "create_charts.py")], check=True, env=env_vars, cwd=project_root)
         subprocess.run([sys.executable, os.path.join(script_dir, "create_strategy_docx.py")], check=True, env=env_vars, cwd=project_root)
         subprocess.run([sys.executable, os.path.join(script_dir, "create_action_plan_xlsx.py")], check=True, env=env_vars, cwd=project_root)
+        subprocess.run([sys.executable, os.path.join(script_dir, "create_presentation_pptx.py"), state["output_dir"], state["company_name"], state["domain"]], check=True, env=env_vars, cwd=project_root)
         
         # Archiving System
         import shutil
@@ -228,6 +246,7 @@ def phase_6_deliverables(state: AuditState):
         try:
             shutil.copy2(os.path.join(deliv_dir, "Strategy_Document.docx"), archive_dir)
             shutil.copy2(os.path.join(deliv_dir, "12_Month_Action_Plan.xlsx"), archive_dir)
+            shutil.copy2(os.path.join(deliv_dir, "Master_Presentation.pptx"), archive_dir)
             shutil.copy2(os.path.join(charts_dir, "integrated_scorecard.png"), archive_dir)
             
             # Copy JSON data for Live Preview
@@ -242,7 +261,12 @@ def phase_6_deliverables(state: AuditState):
                 "company": state["company_name"],
                 "date": env_vars["PROSPECT_DATE"],
                 "timestamp": timestamp,
-                "archive_id": archive_name
+                "archive_id": archive_name,
+                "deliverables": {
+                    "docx": "Strategy_Document.docx",
+                    "xlsx": "12_Month_Action_Plan.xlsx",
+                    "pptx": "Master_Presentation.pptx"
+                }
             }
             with open(os.path.join(archive_dir, "metadata.json"), "w") as f:
                 json.dump(metadata, f, indent=2)

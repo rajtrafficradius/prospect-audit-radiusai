@@ -119,6 +119,7 @@ async def get_status(job_id: str):
         response_data["deliverables"] = {
             "docx": f"/output/sessions/{job_id}/deliverables/Strategy_Document.docx",
             "xlsx": f"/output/sessions/{job_id}/deliverables/12_Month_Action_Plan.xlsx",
+            "pptx": f"/output/sessions/{job_id}/deliverables/Master_Presentation.pptx",
             "scorecard": f"/output/sessions/{job_id}/charts/integrated_scorecard.png"
         }
     return JSONResponse(response_data)

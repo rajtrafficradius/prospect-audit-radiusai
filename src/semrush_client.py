@@ -110,15 +110,58 @@ class SemrushClient:
         res = self._make_request(params)
         return self._parse_csv_to_list(res)
 
+    def get_domain_organic_with_intent(self, domain: str, database: str = "us", display_limit: int = 100) -> List[dict]:
+        """Fetches organic keywords with Intent data (It column)."""
+        params = {
+            "type": "domain_organic",
+            "domain": domain,
+            "database": database,
+            "display_limit": display_limit,
+            "export_columns": "Ph,Po,Pp,Pd,Nq,Cp,Ur,Tr,Tc,Co,Nr,Td,It" # It = Intent
+        }
+        res = self._make_request(params)
+        return self._parse_csv_to_list(res)
 
-def gather_market_intelligence(domain: str, seed_keywords: List[str], database: str = "us", api_key: str = None) -> dict:
-    """Orchestrates pulling the full Market Intelligence payload."""
+
+def gather_market_intelligence(domain: str, seed_keywords: List[str], brand_variations: List[str] = [], blacklist_terms: List[str] = [], database: str = "us", api_key: str = None) -> dict:
+    """Orchestrates pulling the full Market Intelligence payload with strict commercial filtering."""
     client = SemrushClient(api_key=api_key)
-    print(f"Gathering SEMrush data for {domain}...")
+    print(f"Gathering Business-First Intelligence for {domain}...")
+    
+    def is_filtered(text: str, variations: List[str], blacklist: List[str]) -> bool:
+        text_lower = text.lower()
+        # Filter Branded
+        for var in variations:
+            if var.lower() in text_lower:
+                return True
+        # Filter Blacklist
+        for term in blacklist:
+            if term.lower() in text_lower:
+                return True
+        return False
     
     # 1. Prospect Overview
     prospect_ranks = client.get_domain_ranks(domain, database)
-    top_keywords = client.get_domain_organic_keywords(domain, database, display_limit=20)
+    all_keywords = client.get_domain_organic_with_intent(domain, database, display_limit=100)
+    
+    # Filter keywords: No Branded, No Blacklisted, Prioritize Commercial/Transactional Intent
+    # Intent: 1=Informational, 2=Navigational, 3=Commercial, 4=Transactional
+    commercial_keywords = []
+    for kw in all_keywords:
+        phrase = kw.get("Keyword", "")
+        intent = kw.get("Intent", "0")
+        
+        # 1. Skip if branded or blacklisted
+        if is_filtered(phrase, brand_variations, blacklist_terms):
+            continue
+            
+        # 2. Focus on high-intent (Commercial/Transactional)
+        if intent in ["3", "4"] or any(s.lower() in phrase.lower() for s in seed_keywords):
+            commercial_keywords.append(kw)
+    
+    # Fallback to top keywords if filtering is too aggressive
+    top_keywords = commercial_keywords[:20] if commercial_keywords else all_keywords[:10]
+    
     prospect_backlinks = client.get_backlinks_overview(domain)
 
     prospect_data = {
@@ -133,11 +176,20 @@ def gather_market_intelligence(domain: str, seed_keywords: List[str], database: 
     }
     
     # 2. Competitors
-    competitors_raw = client.get_competitors_organic(domain, database, display_limit=4)
+    competitors_raw = client.get_competitors_organic(domain, database, display_limit=15)
     competitors = []
     
     for comp in competitors_raw:
-        c_domain = comp.get("Domain")
+        if len(competitors) >= 5:
+            break
+            
+        c_domain = comp.get("Domain", "")
+        
+        # Filter Competitors: Skip non-commercial or blacklisted domains
+        if is_filtered(c_domain, brand_variations, blacklist_terms):
+            print(f" [!] Skipping non-commercial competitor: {c_domain}")
+            continue
+        
         if c_domain:
             # Get full ranks for competitor
             c_ranks = client.get_domain_ranks(c_domain, database)

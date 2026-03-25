@@ -25,6 +25,12 @@ class ContentGuidance(BaseModel):
     recommended_schemas: List[str] = Field(description="List of 3 specific schema types to implement (e.g., FAQPage, HowTo).")
     sub_topics: List[str] = Field(description="List of 4 specific long-tail keywords or sub-topics to cover as H2s.")
 
+class RevenueOpportunity(BaseModel):
+    service_product: str
+    traffic_potential: str
+    estimated_roi_impact: str = Field(description="Qualitative or quantitative estimate of business growth.")
+    strategic_priority: str = Field(description="'High', 'Medium', or 'Low' based on market demand.")
+
 class StrategyNarrative(BaseModel):
     executive_summary: str = Field(
         description="A highly customized, aggressive 4-paragraph executive summary detailing the prospect's current position, the massive missed opportunity in the search landscape, and the core value proposition of our agency's intervention."
@@ -53,6 +59,9 @@ class StrategyNarrative(BaseModel):
     integrated_strategy_authority: StrategyPillar = Field(
         description="Pillar 3: Authority & Entity Building. Digital PR, backlink strategies, and entity identity reinforcement to win GEO algorithms."
     )
+    revenue_opportunity_map: List[RevenueOpportunity] = Field(
+        description="A mapping of the prospect's primary services to their market potential and expected ROI."
+    )
 
 def synthesize_strategy(business_data: dict, market_data: dict, audit_data: dict, rag_db=None) -> dict:
     """
@@ -77,16 +86,19 @@ def synthesize_strategy(business_data: dict, market_data: dict, audit_data: dict
             print(f"RAG Context generation failed: {e}")
 
     prompt = f"""
-    You are an elite, aggressive Senior SEO/AEO Strategist at TrafficRadius.
-    You are preparing a final strategy document for a prospect. 
+    You are an elite, Senior Strategic Growth Partner at TrafficRadius.
+    Your task is to synthesize a MASTER STRATEGY for a high-value prospect. 
+    
+    TONAL GUIDELINES:
+    1. POSITIVE & EMPOWERING: Instead of just 'fixing problems', focus on 'capturing opportunities'. The prospect should feel excited and valued.
+    2. BUSINESS-FIRST: Every SEO/AEO/GEO recommendation must be linked to REVENUE, LEADS, or MARKET DOMINANCE. 
+    3. COMMERCIAL CORE: Focus exclusively on the money-making segments revealed in the data. Ignore non-commercial noise.
+    
     Review the following raw data extracted from their website, their technical audit, and their SEMrush market intelligence.
     
     Translate this data into a highly bespoke, hard-hitting, extremely detailed long-form narrative.
-    Do not use generic fluff. Use the exact competitor names, exact keyword volumes, and exact technical failures found in the data.
-    If 'Deep Site Knowledge' is provided, use it to point out highly specific pages or content gaps on their site.
-    Make the prospect feel the urgency of the lost opportunity and the brilliance of the proposed AEO/GEO strategy.
-    
-    CRITICAL INSTRUCTION: Do NOT write short paragraphs. You must write extremely detailed, long-form content. Flesh out every single point with rationale, impact, and strategic foresight. Give it the depth of a premium $10,000 consulting report.
+    Use the exact competitor names, exact keyword volumes, and exact technical failures found in the data.
+    If 'Deep Site Knowledge' is provided, use it to point out highly specific 'Money Pages' or commercial content gaps.
     
     --- BUSINESS DATA ---
     {json.dumps(business_data, indent=2)}
@@ -103,11 +115,11 @@ def synthesize_strategy(business_data: dict, market_data: dict, audit_data: dict
     completion = client.beta.chat.completions.parse(
         model="gpt-4o",
         messages=[
-            {"role": "system", "content": "You are a Senior Technical SEO & Digital Strategist."},
+            {"role": "system", "content": "You are a Senior Strategic Growth Partner. Your goal is to make the prospect feel the massive value in our partnership through data-backed, revenue-focused storytelling."},
             {"role": "user", "content": prompt}
         ],
         response_format=StrategyNarrative,
-        temperature=0.7
+        temperature=0.3
     )
     
     return completion.choices[0].message.parsed.model_dump()
