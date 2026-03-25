@@ -13,7 +13,11 @@ def create_ppt_package(session_dir, company_name):
     """
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     scripts_dir = os.path.join(project_root, "scripts")
-    output_path = os.path.join(session_dir, "deliverables", "Master_Presentation.pptx")
+    
+    deliv_dir = os.path.join(session_dir, "deliverables")
+    os.makedirs(deliv_dir, exist_ok=True)
+    
+    output_path = os.path.join(deliv_dir, "Master_Presentation.pptx")
     
     # 1. Synthesize Content JSON
     print(" [1/3] Synthesizing Strategic Slide Content...")
@@ -35,8 +39,15 @@ def create_ppt_package(session_dir, company_name):
     prs.slide_height = Inches(7.5)
     
     render_dir = os.path.join(session_dir, "rendered_slides")
+    if not os.path.exists(render_dir):
+        print(f" [!] Error: Render directory missing: {render_dir}")
+        return
+
     slides = sorted([f for f in os.listdir(render_dir) if f.endswith(".png")])
-    
+    if not slides:
+        print(" [!] Error: No rendered slides found to package.")
+        return
+        
     for slide_img in slides:
         slide_layout = prs.slide_layouts[6] # Blank
         slide = prs.slides.add_slide(slide_layout)

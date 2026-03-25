@@ -251,7 +251,7 @@ def phase_6_deliverables(state: AuditState):
         
         if missing:
             print(f" [!] Missing deliverables after generation: {missing}")
-            return {"errors": [f"Missing deliverables: {', '.join(missing)}"]}
+            return {"errors": [f"Generation Failure: {', '.join(missing)} was not created."]}
         
         # Archiving System
         import shutil

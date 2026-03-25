@@ -14,7 +14,9 @@ async function renderSlides(sessionDir, outputDir) {
     const slidesData = JSON.parse(fs.readFileSync(dataPath, 'utf8'));
     const templateHtml = fs.readFileSync(templatePath, 'utf8');
     
-    const browser = await chromium.launch();
+    const browser = await chromium.launch({
+        args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage({
         viewport: { width: 1920, height: 1080 }
     });
