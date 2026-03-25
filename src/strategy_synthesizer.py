@@ -126,7 +126,7 @@ def synthesize_strategy(business_data: dict, market_data: dict, audit_data: dict
 
 if __name__ == "__main__":
     # Local dry-run testing
-    load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+    load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"), override=False)
     
     # Load dummy data or previous run data
     output_dir = os.path.join(os.path.dirname(__file__), "..", "output")

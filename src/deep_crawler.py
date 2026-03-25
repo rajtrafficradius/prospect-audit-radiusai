@@ -11,7 +11,7 @@ import tiktoken
 from openai import AsyncOpenAI, OpenAI
 from dotenv import load_dotenv
 
-load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"))
+load_dotenv(os.path.join(os.path.dirname(__file__), "..", ".env"), override=False)
 
 class DeepCrawlerRAG:
     """
