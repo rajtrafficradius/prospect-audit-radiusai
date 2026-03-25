@@ -153,6 +153,38 @@ async def stream_logs(job_id: str):
             
     return StreamingResponse(log_generator(), media_type="text/event-stream")
 
+@app.get("/api/download/{job_id}/{file_type}")
+async def download_file(job_id: str, file_type: str):
+    """Securely serves deliverables for download."""
+    session_dir = os.path.join(OUTPUT_DIR, "sessions", job_id)
+    file_map = {
+        "docx": "deliverables/Strategy_Document.docx",
+        "xlsx": "deliverables/12_Month_Action_Plan.xlsx",
+        "pptx": "deliverables/Master_Presentation.pptx",
+        "scorecard": "charts/integrated_scorecard.png"
+    }
+    
+    if file_type not in file_map:
+        return JSONResponse({"error": "Invalid file type"}, status_code=400)
+    
+    file_path = os.path.join(session_dir, file_map[file_type])
+    
+    # If not in session, check if job_id is actually an archive_id
+    if not os.path.exists(file_path):
+        archives_dir = os.path.join(OUTPUT_DIR, "archives")
+        # Check if job_id directly exists as a folder in archives
+        archive_path = os.path.join(archives_dir, job_id, os.path.basename(file_map[file_type]))
+        if os.path.exists(archive_path):
+            file_path = archive_path
+        else:
+            return JSONResponse({"error": "File not found"}, status_code=404)
+        
+    return FileResponse(
+        path=file_path,
+        filename=os.path.basename(file_path),
+        media_type="application/octet-stream"
+    )
+
 @app.get("/api/history")
 async def get_history():
     """Returns the history of completed audits from the vault."""

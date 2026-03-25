@@ -79,9 +79,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             <div class="hc-date">${item.date} • Vault: ${item.archive_id ? item.archive_id.slice(0, 8) : 'Legacy'}</div>
                         </div>
                         <div class="hc-actions">
-                            <a href="/output/archives/${item.archive_id}/Strategy_Document.docx" class="btn-dl docx" target="_blank"><i data-feather="file-text"></i> DOCX</a>
-                            <a href="/output/archives/${item.archive_id}/12_Month_Action_Plan.xlsx" class="btn-dl xlsx" target="_blank"><i data-feather="grid"></i> XLSX</a>
-                            <a href="/output/archives/${item.archive_id}/Master_Presentation.pptx" class="btn-dl pptx" target="_blank" style="background: rgba(210, 71, 38, 0.1); color: #ff8a65;"><i data-feather="monitor"></i> PPTX</a>
+                            <a href="/api/download/${item.archive_id}/docx" class="btn-dl docx" target="_blank"><i data-feather="file-text"></i> DOCX</a>
+                            <a href="/api/download/${item.archive_id}/xlsx" class="btn-dl xlsx" target="_blank"><i data-feather="grid"></i> XLSX</a>
+                            <a href="/api/download/${item.archive_id}/pptx" class="btn-dl pptx" target="_blank" style="background: rgba(210, 71, 38, 0.1); color: #ff8a65;"><i data-feather="monitor"></i> PPTX</a>
                             <button class="btn-dl preview-btn" onclick="openLivePreview('${item.archive_id}')"><i data-feather="eye"></i> Preview</button>
                         </div>
                     </div>
@@ -342,9 +342,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const docxLink = document.getElementById('docxLink');
                 const xlsxLink = document.getElementById('xlsxLink');
                 const pptxLink = document.getElementById('pptxLink');
-                if (docxLink) docxLink.href = jobStatus.deliverables.docx;
-                if (xlsxLink) xlsxLink.href = jobStatus.deliverables.xlsx;
-                if (pptxLink) pptxLink.href = jobStatus.deliverables.pptx;
+                if (docxLink) docxLink.href = `/api/download/${jobId}/docx`;
+                if (xlsxLink) xlsxLink.href = `/api/download/${jobId}/xlsx`;
+                if (pptxLink) pptxLink.href = `/api/download/${jobId}/pptx`;
             }
 
             const res = await fetch('/api/history');
