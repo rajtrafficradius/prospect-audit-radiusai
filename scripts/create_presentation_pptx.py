@@ -159,3 +159,4 @@ if __name__ == "__main__":
         gen.generate(ba, mi, au, na)
     except Exception as e:
         print(f"PPT Error: {e}")
+        sys.exit(1)

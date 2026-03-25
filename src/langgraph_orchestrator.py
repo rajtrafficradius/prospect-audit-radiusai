@@ -222,6 +222,10 @@ def phase_6_deliverables(state: AuditState):
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     script_dir = os.path.join(project_root, "scripts")
     
+    # Use venv python if available
+    venv_python = os.path.join(project_root, "venv", "bin", "python")
+    python_exe = venv_python if os.path.exists(venv_python) else sys.executable
+    
     env_vars = os.environ.copy()
     env_vars["OUTPUT_DIR"] = state["output_dir"]
     env_vars["PROSPECT_NAME"] = state["company_name"]
@@ -229,10 +233,25 @@ def phase_6_deliverables(state: AuditState):
     env_vars["PROSPECT_DATE"] = datetime.datetime.now().strftime("%B %d, %Y")
     
     try:
-        subprocess.run([sys.executable, os.path.join(script_dir, "create_charts.py")], check=True, env=env_vars, cwd=project_root)
-        subprocess.run([sys.executable, os.path.join(script_dir, "create_strategy_docx.py")], check=True, env=env_vars, cwd=project_root)
-        subprocess.run([sys.executable, os.path.join(script_dir, "create_action_plan_xlsx.py")], check=True, env=env_vars, cwd=project_root)
-        subprocess.run([sys.executable, os.path.join(script_dir, "create_presentation_pptx.py"), state["output_dir"], state["company_name"], state["domain"]], check=True, env=env_vars, cwd=project_root)
+        subprocess.run([python_exe, os.path.join(script_dir, "create_charts.py")], check=True, env=env_vars, cwd=project_root)
+        subprocess.run([python_exe, os.path.join(script_dir, "create_strategy_docx.py")], check=True, env=env_vars, cwd=project_root)
+        subprocess.run([python_exe, os.path.join(script_dir, "create_action_plan_xlsx.py")], check=True, env=env_vars, cwd=project_root)
+        
+        # PPT Generation with fallback/reporting
+        ppt_result = subprocess.run([python_exe, os.path.join(script_dir, "create_presentation_pptx.py"), state["output_dir"], state["company_name"], state["domain"]], env=env_vars, cwd=project_root)
+        if ppt_result.returncode != 0:
+            print(f" [!] PPT Error: Script exited with {ppt_result.returncode}")
+        
+        # Verify core deliverables exist before archiving
+        missing = []
+        for f in ["Strategy_Document.docx", "12_Month_Action_Plan.xlsx", "Master_Presentation.pptx"]:
+            p = os.path.join(state["output_dir"], "deliverables", f)
+            if not os.path.exists(p):
+                missing.append(f)
+        
+        if missing:
+            print(f" [!] Missing deliverables after generation: {missing}")
+            return {"errors": [f"Missing deliverables: {', '.join(missing)}"]}
         
         # Archiving System
         import shutil

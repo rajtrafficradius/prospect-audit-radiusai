@@ -52,12 +52,16 @@ async def run_audit_job(job_id: str, domain: str, company: str):
     os.makedirs(session_dir, exist_ok=True)
     jobs[job_id]["output_dir"] = session_dir
 
+    # Use venv python if available, otherwise fallback to current sys.executable
+    venv_python = os.path.join(project_root_dir, "venv", "bin", "python")
+    python_exe = venv_python if os.path.exists(venv_python) else sys.executable
+
     try:
         env = os.environ.copy()
         env["PYTHONUNBUFFERED"] = "1"
         
         process = await asyncio.create_subprocess_exec(
-            sys.executable, "-u", script_path, domain, company, "us", session_dir,
+            python_exe, "-u", script_path, domain, company, "us", session_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             cwd=project_root_dir, # Run from the project root directory
