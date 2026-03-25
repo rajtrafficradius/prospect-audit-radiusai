@@ -23,6 +23,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 app.mount("/output", StaticFiles(directory=OUTPUT_DIR), name="output")
+# Sessions are mounted under /output/sessions/ in the filesystem, which is already covered by /output mount
 
 class AuditRequest(BaseModel):
     domain: str
@@ -46,12 +47,17 @@ async def run_audit_job(job_id: str, domain: str, company: str):
     project_root_dir = os.path.join(BASE_DIR, "..")
     script_path = os.path.join(project_root_dir, "src", "langgraph_orchestrator.py")
     
+    # Create unique session directory
+    session_dir = os.path.join(OUTPUT_DIR, "sessions", job_id)
+    os.makedirs(session_dir, exist_ok=True)
+    jobs[job_id]["output_dir"] = session_dir
+
     try:
         env = os.environ.copy()
         env["PYTHONUNBUFFERED"] = "1"
         
         process = await asyncio.create_subprocess_exec(
-            sys.executable, "-u", script_path, domain, company,
+            sys.executable, "-u", script_path, domain, company, "us", session_dir,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             cwd=project_root_dir, # Run from the project root directory
@@ -106,7 +112,16 @@ async def start_audit(domain: str = Form(...), company: str = Form(...), backgro
 async def get_status(job_id: str):
     if job_id not in jobs:
         return JSONResponse({"error": "Job not found"}, status_code=404)
-    return JSONResponse(jobs[job_id])
+    
+    response_data = jobs[job_id].copy()
+    # Add relative paths for front-end access if job is completed
+    if response_data["status"] == "completed":
+        response_data["deliverables"] = {
+            "docx": f"/output/sessions/{job_id}/deliverables/Strategy_Document.docx",
+            "xlsx": f"/output/sessions/{job_id}/deliverables/12_Month_Action_Plan.xlsx",
+            "scorecard": f"/output/sessions/{job_id}/charts/integrated_scorecard.png"
+        }
+    return JSONResponse(response_data)
 
 @app.get("/api/stream-logs/{job_id}")
 async def stream_logs(job_id: str):

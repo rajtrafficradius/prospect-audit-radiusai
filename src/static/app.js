@@ -221,9 +221,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.done) {
                 eventSource.close();
                 if (data.status === 'completed') {
-                    finishPipeline();
+                    finishPipeline(currentJobId);
                 } else {
-                    handleError("Pipeline exited with a failure status.");
+                    handleError(data.message || "Pipeline failed.");
                 }
                 return;
             }
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    async function finishPipeline() {
+    async function finishPipeline(jobId) {
         const currentActive = logList.querySelector('.active');
         if (currentActive) currentActive.classList.remove('active');
 
@@ -333,12 +333,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // Hide Live Status Orb, Show Artifact Vault
         agentLiveStatus.classList.add('hidden');
         
-        const docxLink = document.getElementById('docxLink');
-        const xlsxLink = document.getElementById('xlsxLink');
-        if (docxLink) docxLink.href = `/output/deliverables/Strategy_Document.docx?t=${new Date().getTime()}`;
-        if (xlsxLink) xlsxLink.href = `/output/deliverables/12_Month_Action_Plan.xlsx?t=${new Date().getTime()}`;
-        
         try {
+            const statusRes = await fetch(`/api/status/${jobId}`);
+            const jobStatus = await statusRes.json();
+            
+            if (jobStatus.deliverables) {
+                const docxLink = document.getElementById('docxLink');
+                const xlsxLink = document.getElementById('xlsxLink');
+                if (docxLink) docxLink.href = jobStatus.deliverables.docx;
+                if (xlsxLink) xlsxLink.href = jobStatus.deliverables.xlsx;
+            }
+
             const res = await fetch('/api/history');
             const data = await res.json();
             if (data.history && data.history.length > 0) {

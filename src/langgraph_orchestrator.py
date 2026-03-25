@@ -197,7 +197,9 @@ def phase_6_deliverables(state: AuditState):
     print("\n--- [Node] Phase 6: Injecting Dynamic Architecture to Deliverables ---")
     print("[PROGRESS] 98% | Assembling Deliverables (DOCX, XLSX)")
     import datetime
-    base_dir = os.path.dirname(state["output_dir"])
+    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    script_dir = os.path.join(project_root, "scripts")
+    
     env_vars = os.environ.copy()
     env_vars["OUTPUT_DIR"] = state["output_dir"]
     env_vars["PROSPECT_NAME"] = state["company_name"]
@@ -205,9 +207,9 @@ def phase_6_deliverables(state: AuditState):
     env_vars["PROSPECT_DATE"] = datetime.datetime.now().strftime("%B %d, %Y")
     
     try:
-        subprocess.run(["python", os.path.join(base_dir, "scripts", "create_charts.py")], check=True, env=env_vars, cwd=base_dir)
-        subprocess.run(["python", os.path.join(base_dir, "scripts", "create_strategy_docx.py")], check=True, env=env_vars, cwd=base_dir)
-        subprocess.run(["python", os.path.join(base_dir, "scripts", "create_action_plan_xlsx.py")], check=True, env=env_vars, cwd=base_dir)
+        subprocess.run([sys.executable, os.path.join(script_dir, "create_charts.py")], check=True, env=env_vars, cwd=project_root)
+        subprocess.run([sys.executable, os.path.join(script_dir, "create_strategy_docx.py")], check=True, env=env_vars, cwd=project_root)
+        subprocess.run([sys.executable, os.path.join(script_dir, "create_action_plan_xlsx.py")], check=True, env=env_vars, cwd=project_root)
         
         # Archiving System
         import shutil
@@ -216,7 +218,7 @@ def phase_6_deliverables(state: AuditState):
         # Safe directory name bridging string cleaning rules
         safe_domain = state["domain"].replace("https://", "").replace("http://", "").replace("/", "_")
         archive_name = f"{timestamp}_{safe_domain}"
-        archive_dir = os.path.join(base_dir, "output", "archives", archive_name)
+        archive_dir = os.path.join(project_root, "output", "archives", archive_name)
         os.makedirs(archive_dir, exist_ok=True)
         
         # Copy deliverables to archive vault
@@ -279,9 +281,15 @@ workflow.add_edge("deliverables", END)
 # Compile into an executable AI agent
 app = workflow.compile()
 
-def run_langgraph_pipeline(domain: str, company: str, country: str = "us"):
-    root_dir = os.path.join(os.path.dirname(__file__), "..")
-    out_dir = os.path.join(root_dir, "output")
+def run_langgraph_pipeline(domain: str, company: str, country: str = "us", custom_out_dir: str = None):
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    
+    if custom_out_dir:
+        out_dir = custom_out_dir
+    else:
+        out_dir = os.path.join(root_dir, "output")
+    
+    os.makedirs(out_dir, exist_ok=True)
     os.makedirs(os.path.join(out_dir, "charts"), exist_ok=True)
     os.makedirs(os.path.join(out_dir, "deliverables"), exist_ok=True)
     
@@ -332,7 +340,12 @@ def run_langgraph_pipeline(domain: str, company: str, country: str = "us"):
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 3:
-        print("Usage: python langgraph_orchestrator.py <domain> <company_name> [target_country]")
+        print("Usage: python langgraph_orchestrator.py <domain> <company_name> [target_country] [output_dir]")
         sys.exit(1)
     
-    run_langgraph_pipeline(sys.argv[1], sys.argv[2], sys.argv[3] if len(sys.argv)>3 else "us")
+    domain = sys.argv[1]
+    company = sys.argv[2]
+    country = sys.argv[3] if len(sys.argv) > 3 else "us"
+    out_dir = sys.argv[4] if len(sys.argv) > 4 else None
+    
+    run_langgraph_pipeline(domain, company, country, out_dir)
