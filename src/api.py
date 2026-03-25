@@ -59,12 +59,18 @@ async def run_audit_job(job_id: str, domain: str, company: str):
         )
         
         while True:
-            line = await process.stdout.readline()
-            if not line:
-                break
-            decoded_line = line.decode('utf-8').strip()
-            if decoded_line:
-                job_logs[job_id].append(decoded_line)
+            try:
+                line = await asyncio.wait_for(process.stdout.readline(), timeout=15.0)
+                if not line:
+                    break
+                decoded_line = line.decode('utf-8').strip()
+                if decoded_line:
+                    job_logs[job_id].append(decoded_line)
+            except asyncio.TimeoutError:
+                # This timeout is for the subprocess stdout, not for the SSE client.
+                # The log streaming function handles SSE keep-alives.
+                # We just continue waiting for output from the subprocess.
+                pass # No action needed here, just prevent the loop from breaking
                 
         await process.wait()
         
