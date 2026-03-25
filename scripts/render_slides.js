@@ -30,7 +30,7 @@ async function renderSlides(sessionDir, outputDir) {
         await page.setContent(templateHtml);
 
         // Inject data via DOM manipulation - 100% reliable
-        await page.evaluate((data, sNum, sTotal) => {
+        await page.evaluate(({ data, sNum, sTotal }) => {
             const titleEl = document.getElementById('title');
             const subtitleEl = document.getElementById('subtitle');
             const quoteEl = document.getElementById('quote');
@@ -51,7 +51,7 @@ async function renderSlides(sessionDir, outputDir) {
                     bulletList.appendChild(li);
                 });
             }
-        }, slide, slideNum, slidesData.length);
+        }, { data: slide, sNum: slideNum, sTotal: slidesData.length });
 
         // Visual injection (Charts / Architecture)
         if (slide.visual) {
