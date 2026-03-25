@@ -24,8 +24,11 @@
             <div class="brand-orb"></div>
             <span>Radius AI <b>v3.0</b></span>
         </div>
-        <div class="nav-status">
-            <span class="status-dot"></span> Core Online
+        <div class="nav-actions">
+            <button id="openHistoryBtn" class="nav-btn"><i data-feather="archive"></i> Archives</button>
+            <div class="nav-status">
+                <span class="status-dot"></span> Core Online
+            </div>
         </div>
     </nav>
 
@@ -126,6 +129,14 @@
                     <div id="centralOrb" class="giant-orb booting"></div>
                     <h2 id="agentMainState">Agent deployed.</h2>
                     <p id="agentSubState">Connecting to LangGraph orchestrator...</p>
+                    
+                    <!-- NEW PROGRESS BAR -->
+                    <div class="progress-container hidden" id="progressContainer">
+                        <div class="progress-track">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">0% | Initializing...</div>
+                    </div>
                 </div>
                 
                 <!-- Deliverables Artifact (Hidden until done) -->
@@ -137,20 +148,20 @@
                     </div>
                     
                     <div class="artifact-cards">
-                        <a href="#" id="dl-docx" target="_blank" class="artifact-card word-card">
-                            <div class="ac-icon"><i data-feather="file-text"></i></div>
-                            <div class="ac-text">
-                                <h4>Strategy Document</h4>
-                                <span>.docx</span>
-                            </div>
-                        </a>
-                        <a href="#" id="dl-xlsx" target="_blank" class="artifact-card excel-card">
-                            <div class="ac-icon"><i data-feather="grid"></i></div>
-                            <div class="ac-text">
-                                <h4>Action Plan</h4>
-                                <span>.xlsx</span>
-                            </div>
-                        </a>
+                        <div class="vault-items">
+                            <a id="docxLink" href="#" class="vault-item docx" target="_blank">
+                                <i data-feather="file-text"></i>
+                                <span>Strategy_Document.docx</span>
+                            </a>
+                            <a id="xlsxLink" href="#" class="vault-item xlsx" target="_blank">
+                                <i data-feather="grid"></i>
+                                <span>12_Month_Action_Plan.xlsx</span>
+                            </a>
+                            <button id="livePreviewBtn" class="vault-item preview-btn hidden">
+                                <i data-feather="eye"></i>
+                                <span>Live Preview HTML</span>
+                            </button>
+                        </div>
                         <a href="/output/charts/integrated_scorecard.png" target="_blank" class="artifact-card image-card">
                             <div class="ac-icon"><i data-feather="pie-chart"></i></div>
                             <div class="ac-text">
@@ -173,6 +184,33 @@
                 <ul class="log-stream" id="logList"></ul>
             </div>
         </aside>
+    </div>
+
+    <!-- History Vault Modal -->
+    <div id="historyModal" class="modal-overlay hidden">
+        <div class="glass-modal">
+            <div class="modal-header">
+                <h2><i data-feather="archive"></i> Audit Archives</h2>
+                <button id="closeHistoryBtn" class="close-btn"><i data-feather="x"></i></button>
+            </div>
+            <div class="modal-body" id="historyList">
+                <div class="spinner"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Preview Modal -->
+    <div id="previewModal" class="modal-overlay hidden">
+        <div class="glass-modal preview-modal">
+            <div class="modal-header">
+                <h2><i data-feather="monitor"></i> Strategy Preview</h2>
+                <button id="closePreviewBtn" class="close-btn"><i data-feather="x"></i></button>
+            </div>
+            <div class="modal-body" id="previewContent">
+                <!-- Javascript will populate this -->
+                <div class="spinner"></div>
+            </div>
+        </div>
     </div>
 
     <script src="/static/app.js"></script>

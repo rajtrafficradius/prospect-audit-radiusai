@@ -47,6 +47,7 @@ class AuditState(TypedDict):
 
 def phase_1_extraction_and_vision(state: AuditState):
     print("\n--- [Node] Phase 1 & 1.5: Content Extraction & Vision CRO ---")
+    print("[PROGRESS] 10% | Content Extraction & Vision CRO")
     import concurrent.futures
     import json
     import os
@@ -84,6 +85,7 @@ def phase_1_extraction_and_vision(state: AuditState):
 
 def phase_2_market_intelligence(state: AuditState):
     print("\n--- [Node] Phase 2: High-Quality Market Intelligence ---")
+    print("[PROGRESS] 30% | Gathering Deep SEMrush Market Intelligence")
     import json
     import os
     try:
@@ -104,6 +106,7 @@ def phase_2_market_intelligence(state: AuditState):
 
 def phase_2_5_competitor_shadow(state: AuditState):
     print("\n--- [Node] Phase 2.5: Dynamic Competitor Shadowing ---")
+    print("[PROGRESS] 45% | Shadowing Top Competitors Natively")
     try:
         if not state.get("market_intelligence"):
             return {"errors": ["No market intel found to shadow."]}
@@ -118,6 +121,7 @@ def phase_2_5_competitor_shadow(state: AuditState):
 
 def phase_3_technical_audit(state: AuditState):
     print("\n--- [Node] Phase 3: Technical Lighthouse & SEO Audit ---")
+    print("[PROGRESS] 60% | Running Technical Lighthouse SEO/AEO Audit")
     try:
         d = state["domain"]
         seo_findings = []
@@ -160,6 +164,7 @@ def phase_3_technical_audit(state: AuditState):
 
 def phase_4_deep_rag(state: AuditState):
     print("\n--- [Node] Phase 4: Constructing Recursive FAISS Index ---")
+    print("[PROGRESS] 75% | Constructing Recursive FAISS Vector DB")
     try:
         import asyncio
         rag = DeepCrawlerRAG(state["domain"], state["output_dir"], max_pages=50)
@@ -170,6 +175,7 @@ def phase_4_deep_rag(state: AuditState):
 
 def phase_5_strategy_synthesis(state: AuditState):
     print("\n--- [Node] Phase 5: GPT-4o AEO Strategy Synthesis ---")
+    print("[PROGRESS] 90% | Synthesizing Final Narrative with GPT-4o")
     try:
         rag = None
         if state.get("rag_ready"):
@@ -189,6 +195,7 @@ def phase_5_strategy_synthesis(state: AuditState):
 
 def phase_6_deliverables(state: AuditState):
     print("\n--- [Node] Phase 6: Injecting Dynamic Architecture to Deliverables ---")
+    print("[PROGRESS] 98% | Assembling Deliverables (DOCX, XLSX)")
     import datetime
     base_dir = os.path.dirname(state["output_dir"])
     env_vars = os.environ.copy()
@@ -201,6 +208,47 @@ def phase_6_deliverables(state: AuditState):
         subprocess.run(["python", os.path.join(base_dir, "scripts", "create_charts.py")], check=True, env=env_vars, cwd=base_dir)
         subprocess.run(["python", os.path.join(base_dir, "scripts", "create_strategy_docx.py")], check=True, env=env_vars, cwd=base_dir)
         subprocess.run(["python", os.path.join(base_dir, "scripts", "create_action_plan_xlsx.py")], check=True, env=env_vars, cwd=base_dir)
+        
+        # Archiving System
+        import shutil
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        # Safe directory name bridging string cleaning rules
+        safe_domain = state["domain"].replace("https://", "").replace("http://", "").replace("/", "_")
+        archive_name = f"{timestamp}_{safe_domain}"
+        archive_dir = os.path.join(base_dir, "output", "archives", archive_name)
+        os.makedirs(archive_dir, exist_ok=True)
+        
+        # Copy deliverables to archive vault
+        deliv_dir = os.path.join(state["output_dir"], "deliverables")
+        charts_dir = os.path.join(state["output_dir"], "charts")
+        
+        try:
+            shutil.copy2(os.path.join(deliv_dir, "Strategy_Document.docx"), archive_dir)
+            shutil.copy2(os.path.join(deliv_dir, "12_Month_Action_Plan.xlsx"), archive_dir)
+            shutil.copy2(os.path.join(charts_dir, "integrated_scorecard.png"), archive_dir)
+            
+            # Copy JSON data for Live Preview
+            for json_file in ["strategy_narrative.json", "audit_findings.json", "market_intelligence.json", "cro_assessment.json"]:
+                src_path = os.path.join(state["output_dir"], json_file)
+                if os.path.exists(src_path):
+                    shutil.copy2(src_path, archive_dir)
+            
+            # Save metadata for History Vault API
+            metadata = {
+                "domain": state["domain"],
+                "company": state["company_name"],
+                "date": env_vars["PROSPECT_DATE"],
+                "timestamp": timestamp,
+                "archive_id": archive_name
+            }
+            with open(os.path.join(archive_dir, "metadata.json"), "w") as f:
+                json.dump(metadata, f, indent=2)
+                
+            print(f" [+] Audit permanently archived in {archive_name}")
+        except Exception as e:
+            print(f" [!] Archive Warning: {e}")
+            
         return {}
     except Exception as e:
         return {"errors": [f"Deliverables Error: {e}"]}
@@ -267,6 +315,7 @@ def run_langgraph_pipeline(domain: str, company: str, country: str = "us"):
     print("============================================================")
     print(f" STARTING LANGGRAPH ORCHESTRATOR: {company} ({domain})")
     print("============================================================")
+    print("[PROGRESS] 5% | Booting Agentic Swarm...")
     
     config = {"recursion_limit": 50}
     
@@ -278,6 +327,7 @@ def run_langgraph_pipeline(domain: str, company: str, country: str = "us"):
                 print(f" [+] {node_name} completed successfully.")
                 
     print("\n✅ Enterprise Pipeline Run Complete. Review the output/ folder.")
+    print("[PROGRESS] 100% | Setup Complete!")
 
 if __name__ == "__main__":
     import sys

@@ -85,6 +85,16 @@ body {
 }
 .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); }
 
+/* --- Nav Actions --- */
+.nav-actions { display: flex; align-items: center; gap: 20px; }
+.nav-btn {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--panel-border);
+    color: var(--text-muted); padding: 8px 16px; border-radius: 8px;
+    display: flex; align-items: center; gap: 8px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s ease;
+}
+.nav-btn:hover { background: rgba(59, 130, 246, 0.15); color: #fff; border-color: rgba(59, 130, 246, 0.3); box-shadow: 0 0 15px var(--brand-glow); }
+.nav-btn svg { width: 14px; height: 14px; }
+
 /* --- Utility Classes --- */
 .hidden { display: none !important; opacity: 0; pointer-events: none; }
 
@@ -312,6 +322,30 @@ body {
 .agent-live-status h2 { font-size: 1.5rem; color: #fff; font-weight: 400; margin-bottom: 8px; }
 .agent-live-status p { font-size: 0.9rem; color: var(--text-muted); }
 
+/* Progress Bar */
+.progress-container {
+    width: 250px; margin-top: 1.5rem;
+    animation: fadeIn 0.5s ease;
+}
+.progress-track {
+    width: 100%; height: 6px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 99px; overflow: hidden;
+    position: relative; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);
+}
+.progress-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--brand), #8b5cf6);
+    border-radius: 99px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.6);
+}
+.progress-text {
+    margin-top: 8px; font-size: 0.75rem; letter-spacing: 0.05em;
+    color: var(--brand); font-weight: 500; font-family: var(--font-mono);
+    text-shadow: 0 0 10px var(--brand-glow);
+}
+
 /* Artifact Vault (Deliverables) */
 .artifact-vault {
     text-align: center; animation: slideUp 0.6s ease;
@@ -369,6 +403,68 @@ body {
 .log-item.active::after { content: "█"; margin-left: 6px; animation: cursorBlink 1s step-end infinite; color: #fff; }
 
 @keyframes cursorBlink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+/* === History Modals === */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    z-index: 999; display: flex; justify-content: center; align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+.glass-modal {
+    width: 90%; max-width: 800px; max-height: 80vh;
+    background: rgba(12, 12, 16, 0.7); border: 1px solid var(--panel-border);
+    border-radius: 16px; box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+    display: flex; flex-direction: column; overflow: hidden;
+}
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 20px 24px; border-bottom: 1px solid var(--panel-border);
+}
+.modal-header h2 { display: flex; align-items: center; gap: 12px; font-size: 1.2rem; font-weight: 500; color: #fff; }
+.close-btn { background: none; border: none; color: var(--text-muted); cursor: pointer; }
+.close-btn:hover { color: #fff; }
+.modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+
+.history-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.history-card {
+    background: rgba(255,255,255,0.02); border: 1px solid var(--panel-border);
+    border-radius: 12px; padding: 16px; display: flex; flex-direction: column; gap: 12px;
+    transition: all 0.2s ease;
+}
+.history-card:hover { border-color: rgba(255, 255, 255, 0.15); background: rgba(255,255,255,0.04); }
+.hc-header { border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 12px; }
+.hc-domain { font-size: 1.1rem; color: #fff; font-weight: 500; }
+.hc-company { font-size: 0.8rem; color: var(--text-muted); }
+.hc-date { font-size: 0.75rem; color: var(--brand); font-family: var(--font-mono); margin-top: 4px; }
+.hc-vault-items { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+.vault-item {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    padding: 14px 20px; border-radius: 12px; text-decoration: none; font-weight: 500;
+    transition: all 0.2s ease; font-size: 1rem;
+}
+.vault-item.docx { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.2); }
+.vault-item.xlsx { background: rgba(16, 185, 129, 0.1); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
+.vault-item.preview-btn {
+    background: rgba(236, 72, 153, 0.1); color: #f472b6;
+    border: 1px solid rgba(236, 72, 153, 0.2); cursor: pointer;
+    width: 100%; font-family: inherit; font-size: inherit;
+}
+.vault-item:hover { filter: brightness(1.2); transform: translateY(-2px); }
+
+/* Live Preview Panel */
+.preview-modal { width: 95%; max-width: 1000px; height: 85vh; max-height: 900px; }
+.report-reader {
+    color: #e2e8f0; font-size: 1rem; line-height: 1.6; padding: 20px;
+    background: rgba(0,0,0,0.2); border-radius: 12px; margin-bottom: 20px;
+}
+.report-reader h1 { color: #fff; font-size: 2rem; margin-bottom: 1rem; border-bottom: 1px solid var(--panel-border); padding-bottom: 0.5rem; }
+.report-reader h2 { color: #60a5fa; font-size: 1.4rem; margin-top: 2rem; margin-bottom: 1rem; }
+.report-reader h3 { color: #f472b6; font-size: 1.1rem; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+.report-reader p { margin-bottom: 1rem; color: #cbd5e1; }
+.report-reader ul { margin-left: 20px; margin-bottom: 1rem; color: #94a3b8; }
+.report-reader li { margin-bottom: 4px; }
+.callout { background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 16px; margin: 16px 0; border-radius: 0 8px 8px 0; font-style: italic; color: #bfdbfe; }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar { width: 6px; }

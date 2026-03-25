@@ -77,14 +77,6 @@ async def run_audit_job(job_id: str, domain: str, company: str):
         if process.returncode == 0:
             jobs[job_id]["status"] = "completed"
             jobs[job_id]["message"] = "Audit completed successfully."
-            # Append to history store
-            history_store.append({
-                "id": job_id,
-                "domain": domain,
-                "company": company,
-                "date": "Just Now",
-                "status": "completed"
-            })
         else:
             jobs[job_id]["status"] = "failed"
             jobs[job_id]["message"] = f"Pipeline failed with exit code {process.returncode}"
@@ -147,8 +139,24 @@ async def stream_logs(job_id: str):
 
 @app.get("/api/history")
 async def get_history():
-    """Returns the history of completed audits."""
-    return JSONResponse({"history": list(reversed(history_store))})
+    """Returns the history of completed audits from the vault."""
+    archives_dir = os.path.join(OUTPUT_DIR, "archives")
+    if not os.path.exists(archives_dir):
+        return JSONResponse({"history": []})
+        
+    history = []
+    for folder in os.listdir(archives_dir):
+        meta_path = os.path.join(archives_dir, folder, "metadata.json")
+        if os.path.exists(meta_path):
+            try:
+                with open(meta_path, "r") as f:
+                    history.append(json.load(f))
+            except Exception:
+                pass
+                
+    # Sort newest first
+    history.sort(key=lambda x: x.get("timestamp", ""), reverse=True)
+    return JSONResponse({"history": history})
 
 if __name__ == "__main__":
     import uvicorn

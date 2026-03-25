@@ -27,6 +27,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const logList = document.getElementById('logList');
     const terminalWindow = document.getElementById('terminalWindow');
 
+    // Progress
+    const progressContainer = document.getElementById('progressContainer');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+
     // Agent Nodes
     const agentNodes = {
         'extraction': document.getElementById('node-extraction'),
@@ -36,8 +41,112 @@ document.addEventListener('DOMContentLoaded', () => {
         'synthesis': document.getElementById('node-synthesis')
     };
 
+    // History Modal
+    const historyModal = document.getElementById('historyModal');
+    const openHistoryBtn = document.getElementById('openHistoryBtn');
+    const closeHistoryBtn = document.getElementById('closeHistoryBtn');
+    const historyList = document.getElementById('historyList');
+
+    // Preview Modal
+    const previewModal = document.getElementById('previewModal');
+    const closePreviewBtn = document.getElementById('closePreviewBtn');
+    const previewContent = document.getElementById('previewContent');
+
     let eventSource = null;
     let currentJobId = null;
+
+    // History Functions
+    openHistoryBtn.addEventListener('click', async () => {
+        historyModal.classList.remove('hidden');
+        historyList.innerHTML = '<div class="spinner" style="margin: 40px auto;"></div>';
+        
+        try {
+            const res = await fetch('/api/history');
+            const data = await res.json();
+            
+            if (!data.history || data.history.length === 0) {
+                historyList.innerHTML = '<p style="color: #a1a1aa; text-align: center; padding: 40px;">No archives found. Your past audits will appear here.</p>';
+                return;
+            }
+            
+            let html = '<div class="history-grid">';
+            data.history.forEach(item => {
+                html += `
+                    <div class="history-card">
+                        <div class="hc-header">
+                            <div class="hc-domain">${item.domain}</div>
+                            <div class="hc-company">${item.company}</div>
+                            <div class="hc-date">${item.date} • Vault: ${item.archive_id ? item.archive_id.slice(0, 8) : 'Legacy'}</div>
+                        </div>
+                        <div class="hc-actions">
+                            <a href="/output/archives/${item.archive_id}/Strategy_Document.docx" class="btn-dl docx" target="_blank"><i data-feather="file-text"></i> DOCX</a>
+                            <a href="/output/archives/${item.archive_id}/12_Month_Action_Plan.xlsx" class="btn-dl xlsx" target="_blank"><i data-feather="grid"></i> XLSX</a>
+                            <button class="btn-dl preview-btn" onclick="openLivePreview('${item.archive_id}')"><i data-feather="eye"></i> Preview</button>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            historyList.innerHTML = html;
+            feather.replace();
+            
+        } catch (e) {
+            historyList.innerHTML = '<p style="color: #ef4444; text-align: center; padding: 40px;">Error securely connecting to Archive Vault.</p>';
+        }
+    });
+
+    closeHistoryBtn.addEventListener('click', () => {
+        historyModal.classList.add('hidden');
+    });
+
+    closePreviewBtn.addEventListener('click', () => {
+        previewModal.classList.add('hidden');
+    });
+
+    window.openLivePreview = async (archiveId) => {
+        previewModal.classList.remove('hidden');
+        previewContent.innerHTML = '<div class="spinner" style="margin: 40px auto;"></div><p style="text-align:center;color:var(--text-muted);">Decrypting Vault Artifacts...</p>';
+
+        try {
+            const res = await fetch(`/output/archives/${archiveId}/strategy_narrative.json`);
+            if (!res.ok) throw new Error("Preview format not supported on older legacy archives.");
+            
+            const data = await res.json();
+            
+            let html = `<div class="report-reader">`;
+            html += `<h1>Executive Summary</h1>`;
+            html += `<p>${data.executive_summary || 'N/A'}</p>`;
+            
+            html += `<h2>Competitive Landscape</h2>`;
+            html += `<p>${data.competitive_landscape_analysis || 'N/A'}</p>`;
+            
+            if (data.integrated_strategy_technical) {
+                html += `<h2>Technical & AI Readiness (Pillar 1)</h2>`;
+                html += `<p>${data.integrated_strategy_technical.overview || 'N/A'}</p>`;
+                if (data.integrated_strategy_technical.key_initiatives) {
+                    html += `<ul>${data.integrated_strategy_technical.key_initiatives.map(i => `<li>${i}</li>`).join('')}</ul>`;
+                }
+            }
+            
+            if (data.content_strategy_roadmap && data.content_strategy_roadmap.length > 0) {
+                html += `<h2>Key Content Opportunities</h2>`;
+                data.content_strategy_roadmap.forEach(pillar => {
+                    html += `<h3>${pillar.topic}</h3>`;
+                    html += `<p>${pillar.rationale}</p>`;
+                    if (pillar.sub_topics) {
+                        html += `<ul>${pillar.sub_topics.map(t => `<li>${t}</li>`).join('')}</ul>`;
+                    }
+                });
+            }
+            
+            html += `</div>`;
+            previewContent.innerHTML = html;
+            
+        } catch(e) {
+            previewContent.innerHTML = `<p style="color: #f472b6; text-align: center; padding: 40px;"><i data-feather="alert-triangle"></i> ${e.message}</p>`;
+            feather.replace();
+        }
+    };
 
     // Form Submission
     form.addEventListener('submit', async (e) => {
@@ -88,6 +197,10 @@ document.addEventListener('DOMContentLoaded', () => {
         artifactVault.classList.add('hidden');
         agentLiveStatus.classList.remove('hidden');
         
+        progressContainer.classList.add('hidden');
+        progressFill.style.width = '0%';
+        progressText.innerText = '0% | Initializing...';
+        
         centralOrb.className = 'giant-orb booting';
         agentMainState.innerText = "Agent Deployed";
         agentSubState.innerText = "Connecting to LangGraph network...";
@@ -127,6 +240,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Advanced Parser for Node Tracking and Orb Morphing
     function parseAndRenderLog(rawText) {
+        // Skip silent keep-alives
+        if (rawText.includes(": keep-alive ping")) return;
+
+        // Intercept Progress Markers
+        if (rawText.includes("[PROGRESS]")) {
+            const match = rawText.match(/\[PROGRESS\]\s*([^\|]+)\|\s*(.*)/);
+            if (match) {
+                const percent = match[1].trim();
+                const desc = match[2].trim();
+                progressContainer.classList.remove('hidden');
+                progressFill.style.width = percent;
+                progressText.innerText = `${percent} | ${desc}`;
+                return; // Do not render PROGRESS tags in terminal directly
+            }
+        }
+
         const currentActive = logList.querySelector('.active');
         if (currentActive) currentActive.classList.remove('active');
 
@@ -195,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function finishPipeline() {
+    async function finishPipeline() {
         const currentActive = logList.querySelector('.active');
         if (currentActive) currentActive.classList.remove('active');
 
@@ -204,8 +333,25 @@ document.addEventListener('DOMContentLoaded', () => {
         // Hide Live Status Orb, Show Artifact Vault
         agentLiveStatus.classList.add('hidden');
         
-        document.getElementById('dl-docx').href = `/output/deliverables/Strategy_Document.docx`;
-        document.getElementById('dl-xlsx').href = `/output/deliverables/12_Month_Action_Plan.xlsx`;
+        const docxLink = document.getElementById('docxLink');
+        const xlsxLink = document.getElementById('xlsxLink');
+        if (docxLink) docxLink.href = `/output/deliverables/Strategy_Document.docx?t=${new Date().getTime()}`;
+        if (xlsxLink) xlsxLink.href = `/output/deliverables/12_Month_Action_Plan.xlsx?t=${new Date().getTime()}`;
+        
+        try {
+            const res = await fetch('/api/history');
+            const data = await res.json();
+            if (data.history && data.history.length > 0) {
+                const latest = data.history[0]; // Most recent audit
+                const previewBtn = document.getElementById('livePreviewBtn');
+                if (previewBtn) {
+                    previewBtn.classList.remove('hidden');
+                    previewBtn.onclick = () => window.openLivePreview(latest.archive_id);
+                }
+            }
+        } catch(e) {
+            console.error("Failed to fetch latest archive for preview binding", e);
+        }
         
         setTimeout(() => {
             artifactVault.classList.remove('hidden');
