@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master Presentation Slide Template</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #1B2A4A;
+            --blue: #2E5090;
+            --accent: #00CCFF;
+            --gold: #D4AF37;
+            --white: #FFFFFF;
+            --glass: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-blur: blur(12px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background: var(--navy);
+            color: var(--white);
+            font-family: 'Inter', sans-serif;
+            width: 1920px;
+            height: 1080px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Ambient Background Gradients */
+        .ambient-glow {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(46, 80, 144, 0.3) 0%, rgba(27, 42, 74, 0) 70%);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .glow-tr { top: -200px; right: -200px; }
+        .glow-bl { bottom: -200px; left: -200px; }
+
+        .slide-container {
+            width: 1700px;
+            height: 880px;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Header Navigation Style */
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 60px;
+            border-bottom: 2px solid var(--glass-border);
+            padding-bottom: 20px;
+        }
+
+        .slide-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            font-size: 72px;
+            letter-spacing: -1.5px;
+            text-transform: uppercase;
+            background: linear-gradient(135deg, #FFF 0%, #CCC 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .slide-subtitle {
+            font-size: 24px;
+            color: var(--accent);
+            font-weight: 400;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            flex-grow: 1;
+        }
+
+        .text-section {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .visual-section {
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: var(--glass-blur);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .visual-placeholder {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 15px;
+        }
+
+        /* Bullet Points with Style */
+        .bullet-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .bullet-item {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            font-size: 32px;
+            line-height: 1.4;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .bullet-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--accent);
+            border-radius: 10px;
+            flex-shrink: 0;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 15px rgba(0, 204, 255, 0.4);
+        }
+
+        /* Large Impact Quote */
+        .impact-quote {
+            font-family: 'Outfit', sans-serif;
+            font-size: 48px;
+            font-weight: 300;
+            border-left: 6px solid var(--gold);
+            padding-left: 30px;
+            margin: 40px 0;
+            color: #DDD;
+        }
+
+        .impact-quote strong {
+            color: var(--gold);
+            font-weight: 700;
+        }
+
+        /* Footer Info */
+        .slide-footer {
+            position: absolute;
+            bottom: -60px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 1px;
+        }
+
+        /* Cover Slide Specifics */
+        .cover-slide {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cover-tagline {
+            font-size: 32px;
+            font-weight: 300;
+            color: var(--accent);
+            margin-bottom: 20px;
+            letter-spacing: 5px;
+        }
+
+        .cover-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 120px;
+            font-weight: 800;
+            margin-bottom: 40px;
+            line-height: 0.9;
+        }
+
+        .cover-detail {
+            font-size: 28px;
+            color: var(--gold);
+            font-weight: 500;
+        }
+
+        /* Utility for different layouts */
+        .layout-full { grid-template-columns: 1fr; }
+        .layout-split { grid-template-columns: 1fr 1fr; }
+        .layout-reverse { grid-template-columns: 1.2fr 1fr; direction: rtl; }
+        .layout-reverse > * { direction: ltr; }
+
+    </style>
+</head>
+<body>
+    <div class="ambient-glow glow-tr"></div>
+    <div class="ambient-glow glow-bl"></div>
+
+    <div class="slide-container" id="slide">
+        <!-- HEADER -->
+        <div class="slide-header">
+            <div>
+                <p class="slide-subtitle" id="subtitle">MARKET INTELLIGENCE & GAP ANALYSIS</p>
+                <h1 class="slide-title" id="title">Competitive Dominance</h1>
+            </div>
+            <div style="text-align: right;">
+                <p style="color: var(--accent); font-weight: 800; font-size: 24px;">TRAFFIC RADIUS</p>
+                <p style="font-size: 14px; color: #666;">GROWTH ARCHITECTURE</p>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content-grid" id="content-grid">
+            <div class="text-section">
+                <ul class="bullet-list" id="bullets">
+                    <li class="bullet-item">
+                        <div class="bullet-icon"></div>
+                        <span>Primary market rival <strong>CompetitorX</strong> currently captures 45% of high-intent search share.</span>
+                    </li>
+                    <li class="bullet-item">
+                        <div class="bullet-icon"></div>
+                        <span>Significant opportunity identified in the <strong>Furniture Category</strong> for transactional long-tail keywords.</span>
+                    </li>
+                    <li class="bullet-item">
+                        <div class="bullet-icon"></div>
+                        <span>Our AEO strategy will out-position competitors in AI-driven answer engines like ChatGPT and Perplexity.</span>
+                    </li>
+                </ul>
+                <div class="impact-quote" id="quote">
+                    "Search is evolving from <strong>Links</strong> to <strong>Answers</strong>. This is your first-mover advantage."
+                </div>
+            </div>
+            <div class="visual-section">
+                <!-- Visuals will be injected here (Charts/AI Diagrams) -->
+                <img src="https://via.placeholder.com/800x600/1B2A4A/00CCFF?text=Data+Visualization" class="visual-placeholder" id="visual">
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="slide-footer">
+            <p>CONFIDENTIAL STRATEGY | © 2026 TRAFFIC RADIUS</p>
+            <p id="slide-num">SLIDE 01 OF 15</p>
+        </div>
+    </div>
+</body>
+</html>
