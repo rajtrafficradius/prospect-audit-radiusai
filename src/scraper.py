@@ -3,16 +3,31 @@ import asyncio
 from playwright.async_api import async_playwright
 from urllib.parse import urljoin, urlparse
 
-async def scrape_page(page, url):
-    """Scrapes the visible text from a given URL."""
-    try:
-        await page.goto(url, wait_until="domcontentloaded", timeout=30000)
-        # Extract text, remove excessive whitespace
-        content = await page.evaluate("() => document.body.innerText")
-        return {"url": url, "content": " ".join(content.split())}
-    except Exception as e:
-        print(f"Error scraping {url}: {e}")
-        return {"url": url, "content": ""}
+async def scrape_page(page, url, retry_count=2):
+    """Scrapes the visible text from a given URL with retry logic for context destruction."""
+    for attempt in range(retry_count + 1):
+        try:
+            # wait_until="load" is safer for complex sites than domcontentloaded
+            await page.goto(url, wait_until="load", timeout=30000)
+            await page.wait_for_timeout(1000) # Settling time
+            
+            # Extract text safely
+            content = await page.evaluate("() => document.body ? document.body.innerText : ''")
+            if content:
+                return {"url": url, "content": " ".join(content.split())}
+                
+            # Fallback for empty body/rendered content
+            content = await page.content()
+            return {"url": url, "content": content[:5000]} # Limit raw HTML
+            
+        except Exception as e:
+            if "context was destroyed" in str(e) and attempt < retry_count:
+                print(f" [!] Context destroyed for {url}, retrying ({attempt+1}/{retry_count})...")
+                await asyncio.sleep(1)
+                continue
+            print(f"Error scraping {url}: {e}")
+            return {"url": url, "content": ""}
+    return {"url": url, "content": ""}
 
 async def scrape_website_core_pages(base_url, output_dir=None):
     """
@@ -52,11 +67,15 @@ async def scrape_website_core_pages(base_url, output_dir=None):
         home_data = await scrape_page(page, base_url)
         results.append(home_data)
 
-        # Attempt to find links to key pages
+        # Attempt to find links to key pages with a safety guard
         try:
+            await page.wait_for_load_state("networkidle", timeout=5000)
             links = await page.evaluate('''() => {
-                return Array.from(document.querySelectorAll('a'))
-                    .map(a => ({ text: a.innerText.toLowerCase(), href: a.href }))
+                const anchors = Array.from(document.querySelectorAll('a'));
+                return anchors.map(a => ({ 
+                    text: (a.innerText || a.textContent || "").toLowerCase(), 
+                    href: a.href 
+                })).filter(l => l.href && l.href.startsWith('http'));
             }''')
             
             # Filter for common core pages
