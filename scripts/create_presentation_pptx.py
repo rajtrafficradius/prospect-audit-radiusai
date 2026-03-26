@@ -55,6 +55,10 @@ def create_ppt_package(session_dir, company_name):
         slide.shapes.add_picture(img_path, 0, 0, width=prs.slide_width, height=prs.slide_height)
 
     prs.save(output_path)
+    
+    if not os.path.exists(output_path):
+        raise FileNotFoundError(f"PowerPoint engine failed to save file at {output_path}")
+        
     print(f" [+] Success: Master Presentation finalized at {output_path}")
 
 if __name__ == "__main__":

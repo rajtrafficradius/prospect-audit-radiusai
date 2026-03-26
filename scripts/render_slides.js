@@ -36,9 +36,9 @@ async function renderSlides(sessionDir, outputDir) {
         await page.setContent(templateHtml);
 
         // Inject data via DOM manipulation
-        await page.evaluate(({ data, sNum, sTotal, logoB64 }) => {
+        await page.evaluate(({ slide, index, totalSlides, logoB64 }) => {
             // 1. Layout Selection
-            document.body.className = `layout-${data.layout || 'split'}`;
+            document.body.className = `layout-${slide.layout || 'split'}`;
             
             const titleEl = document.getElementById('title');
             const subtitleEl = document.getElementById('subtitle');
@@ -89,23 +89,19 @@ async function renderSlides(sessionDir, outputDir) {
             }
 
             // VISUAL / DIAGRAM INJECTION
-            // The AI now provides 'visual_type' and 'visual_data' or 'visual' (image path)
             if (typeof window.renderDiagram === 'function') {
                 if (slide.visual_type && slide.visual_data) {
                     window.renderDiagram(slide.visual_type, slide.visual_data);
                 } else if (slide.visual) {
-                    // Fallback to image if no diagram type specified
                     window.renderDiagram('image', slide.visual);
                 } else {
-                    // No visual at all
                     window.renderDiagram('none');
                 }
             } else {
-                // Fallback if renderDiagram is not available (e.g., template not loaded correctly)
                 if (visualSection) visualSection.style.display = 'none';
             }
 
-        }, { slide: slide, index: i, company: company, domain: domain, logoB64: logoBase64, totalSlides: slidesData.length });
+        }, { slide, index: i, totalSlides: slidesData.length, logoB64: logoBase64 });
 
         // Handle Image Path Resolution (relative to sessionDir) for 'image' type visuals
         // This needs to happen AFTER the page.evaluate call sets up the visual type

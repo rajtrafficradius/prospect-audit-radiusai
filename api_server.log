@@ -268,3 +268,11 @@ INFO:     Finished server process [17529]
 INFO:     Started server process [17556]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'scripts/create_presentation_pptx.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [17556]
+INFO:     Started server process [20134]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
