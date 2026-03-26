@@ -351,22 +351,59 @@
             
             if (type === 'pyramid') {
                 const el = document.getElementById('diag-pyramid');
-                if (el) el.style.display = 'flex';
+                if (el) {
+                    el.style.display = 'flex';
+                    const tiers = el.querySelectorAll('.pyramid-tier');
+                    if (data && data.length >= 3) {
+                        tiers[0].innerText = data[0];
+                        tiers[1].innerText = data[1];
+                        tiers[2].innerText = data[2];
+                    }
+                }
             } else if (type === 'funnel') {
                 const el = document.getElementById('diag-funnel');
-                if (el) el.style.display = 'flex';
+                if (el) {
+                    el.style.display = 'flex';
+                    const steps = el.querySelectorAll('.funnel-step');
+                    if (data && data.length >= 4) {
+                        steps[0].innerText = data[0];
+                        steps[1].innerText = data[1];
+                        steps[2].innerText = data[2];
+                        steps[3].innerText = data[3];
+                    }
+                }
             } else if (type === 'matrix') {
                 const el = document.getElementById('diag-matrix');
-                if (el) el.style.display = 'grid';
+                if (el) {
+                    el.style.display = 'grid';
+                    const quads = el.querySelectorAll('.matrix-quad');
+                    quads.forEach(q => q.classList.remove('quad-active'));
+                    
+                    if (data && data.length >= 4) {
+                        quads[0].innerText = data[0];
+                        quads[1].innerText = data[1];
+                        quads[2].innerText = data[2];
+                        quads[3].innerText = data[3];
+                        // If 5th element is provided, it's the active index (0-3)
+                        if (data[4] !== undefined) {
+                            const idx = parseInt(data[4]);
+                            if (quads[idx]) quads[idx].classList.add('quad-active');
+                        } else {
+                            quads[1].classList.add('quad-active'); // Default to Top-Right
+                        }
+                    }
+                }
             } else if (type === 'radar') {
                 const el = document.getElementById('diag-radar');
                 if (el) el.style.display = 'block';
-                drawRadar(data || [80, 60, 70, 90, 85]);
+                // Convert string segments to numbers
+                const scores = (data || []).map(v => parseInt(v) || 50);
+                drawRadar(scores.length >= 5 ? scores : [80, 60, 70, 90, 85]);
             } else if (type === 'image') {
                 const img = document.getElementById('visual-img');
                 if (img) {
                     img.style.display = 'block';
-                    img.src = data;
+                    img.src = data[0] || data; // Handle both list and string
                 }
             } else {
                 if (visualSection) visualSection.style.display = 'none';

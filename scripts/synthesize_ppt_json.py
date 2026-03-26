@@ -15,7 +15,8 @@ class Slide(BaseModel):
     subtitle: Optional[str] = ""
     bullets: List[str] = Field(default_factory=list)
     quote: Optional[str] = ""
-    visual: Optional[str] = Field(None, description="Filename of a chart or visual asset.")
+    visual_type: Optional[str] = Field(None, description="One of: 'radar', 'pyramid', 'funnel', 'matrix', 'image'")
+    visual_data: Optional[List[str]] = Field(default_factory=list, description="Data for the visual. List of 5 integers (strings) for radar, 3 labels for pyramid, 4 for funnel, or 1 image path for image.")
     layout: str = Field("bullets", description="Layout choice: 'title', 'bullets', 'split', 'chart', 'quote'")
 
 class PresentationData(BaseModel):
@@ -50,18 +51,18 @@ def synthesize_ppt_json(session_dir, company_name):
     3. NO PROJECTED REVENUE: NEVER give specific '$' projections. Use qualitative competitive impact.
 
     MANDATORY VISUALS (CSS DIAGRAMS):
-    You MUST select one of these 'visual_type' options for every slide (except 'title' layout):
-    - 'radar': Use for Audit Scorecards. 'visual_data' = list of 5 scores [SEO, AEO, GEO, UI, Trust] (0-100).
-    - 'funnel': Use for Traffic & Conversion flows. 
-    - 'pyramid': Use for Strategy Architecture (SEO/AEO/GEO layers).
-    - 'matrix': Use for Competitive Positioning.
-    - 'image': Use ONLY for 'homepage_screenshot.png' (for UI/CRO slides).
+    You MUST provide 'visual_type' and 'visual_data' for every slide (except 'title' layout):
+    - 'radar': 'visual_data' = [SEO, AEO, GEO, UI, Trust] (5 integers as strings, 0-100).
+    - 'funnel': 'visual_data' = [Step 1, Step 2, Step 3, Step 4] (4 descriptive labels).
+    - 'pyramid': 'visual_data' = [Top Layer, Middle Layer, Bottom Layer] (3 labels).
+    - 'matrix': 'visual_data' = [Quad 1, Quad 2, Quad 3, Quad 4, ActiveIndex] (4 labels + 1 index '0'-'3').
+    - 'image': 'visual_data' = ['homepage_screenshot.png'] (Use for UI/CRO slides).
     
     MANDATORY SLIDE STRUCTURE (STRICT):
-    - Slide 1: **COVER SLIDE** (Layout: 'title'). Title: '{company_name} Strategic Growth Audit'. Subtitle: 'Proprietary Growth Architecture for Market Dominance'.
-    - Slide 2: **EXECUTIVE SUMMARY** (Layout: 'bullets', Visual: 'radar'). Title: 'The Opportunity Landscape'. Subtitle: 'Synthesis of current market inefficiencies vs future authority.'.
-    - Slide 3: **STRATEGIC ROADMAP** (Layout: 'bullets', Visual: 'pyramid'). Title: 'Phased Acceleration Framework'. Subtitle: 'Building the foundation for sustainable market leadership.'.
-    - Slides 4-14: Strategic Deep-Dives. Mix layouts ('split', 'chart') and visuals ('funnel', 'matrix', 'radar'). Use 'image' (homepage_screenshot.png) sparingly for CRO.
+    - Slide 1: **COVER SLIDE** (Layout: 'title').
+    - Slide 2: **EXECUTIVE SUMMARY** (Layout: 'bullets', visual_type: 'radar').
+    - Slide 3: **STRATEGIC ROADMAP** (Layout: 'bullets', visual_type: 'pyramid').
+    - Slides 4-14: Strategic Deep-Dives. Mix 'funnel', 'matrix', 'radar'. Use 'image' (homepage_screenshot.png) for CRO.
     - Slide 15: **PARTNERSHIP & NEXT STEPS** (Layout: 'bullets').
     
     --- DATA CONTEXT ---
