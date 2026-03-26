@@ -85,22 +85,51 @@ class DeepCrawlerRAG:
             pass
         return urls
 
-    async def _fetch_page(self, session, url):
+    async def _fetch_page(self, browser_context, url):
+        """Fetches page content via Stealth Playwright with robust Cloudflare bypass."""
+        page = await browser_context.new_page()
         try:
-            async with session.get(url, timeout=15) as resp:
-                if resp.status == 200:
-                    html = await resp.text()
-                    soup = BeautifulSoup(html, "html.parser")
-                    # Strip unnecessary noise
-                    for tag in soup(["script", "style", "nav", "footer", "header", "noscript"]):
-                        tag.decompose()
-                    text = soup.get_text(separator=' ', strip=True)
-                    # Clean up huge whitespaces
-                    text = re.sub(r'\s+', ' ', text)
-                    if len(text) > 100:
-                        return {"url": url, "text": text}
-        except Exception:
-            pass
+            await page.set_viewport_size({"width": 1920, "height": 1080})
+            
+            # Initial navigation
+            try:
+                await page.goto(url, wait_until="domcontentloaded", timeout=45000)
+            except Exception as e:
+                if "navigation" in str(e).lower():
+                    # Likely a redirect or challenge page loading, wait and continue
+                    await page.wait_for_timeout(5000)
+                else:
+                    raise e
+            
+            # Cloudflare Challenge Resolution Loop (Max 15s)
+            for i in range(3):
+                try:
+                    content = await page.evaluate("() => document.body ? document.body.innerText : ''")
+                    if "checking your browser" in content.lower() or "verify you are human" in content.lower() or "enable cookies" in content.lower():
+                        print(f"  [!] Cloudflare challenge detected (Attempt {i+1}). Waiting 5s...")
+                        await page.wait_for_timeout(5000)
+                    else:
+                        break
+                except Exception:
+                    # If evaluation fails during redirect, wait and retry
+                    await page.wait_for_timeout(2000)
+            
+            # Final wait for network and content rendering
+            try:
+                await page.wait_for_load_state("networkidle", timeout=5000)
+            except:
+                pass
+            
+            # Extract content
+            content = await page.evaluate("() => document.body ? document.body.innerText : ''")
+            
+            if len(content.strip()) > 200:
+                return {"url": url, "text": " ".join(content.split())}
+                
+        except Exception as e:
+            print(f"  [!] Error crawling {url}: {e}")
+        finally:
+            await page.close()
         return None
 
     def chunk_text(self, text, url, chunk_size=400):
@@ -114,16 +143,45 @@ class DeepCrawlerRAG:
 
     async def build_index(self):
         print(f"[{self.domain}] Hunting for sitemaps...")
+        
+        # We still use aiohttp for the initial sitemap XML fetch as it's usually not protected by the same JS challenge
         urls = await self._fetch_sitemap_urls()
-        print(f"[{self.domain}] Found {len(urls)} URLs. Starting asynchronous deep crawl...")
+        
+        if not urls:
+            print(f"[{self.domain}] No sitemap found. Falling back to homepage-only RAG.")
+            urls = [self.base_url]
+
+        print(f"[{self.domain}] Found {len(urls)} target URLs. Initializing Stealth Playwright Crawler...")
 
         crawled_data = []
-        async with aiohttp.ClientSession() as session:
-            tasks = [self._fetch_page(session, url) for url in urls]
-            results = await asyncio.gather(*tasks)
-            crawled_data = [r for r in results if r]
+        
+        from playwright.async_api import async_playwright
+        async with async_playwright() as p:
+            # Launch stealth-like browser
+            browser = await p.chromium.launch(
+                headless=True,
+                args=["--no-sandbox", "--disable-setuid-sandbox", "--disable-blink-features=AutomationControlled"]
+            )
+            context = await browser.new_context(
+                user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+            )
             
-        print(f"[{self.domain}] Successfully crawled and cleaned {len(crawled_data)} pages.")
+            # We process in small chunks to avoid overloading the browser context
+            chunk_size = 5
+            for i in range(0, len(urls), chunk_size):
+                batch_urls = urls[i:i + chunk_size]
+                print(f"  [+] Crawling batch {i//chunk_size + 1}: {len(batch_urls)} pages...")
+                
+                tasks = [self._fetch_page(context, url) for url in batch_urls]
+                results = await asyncio.gather(*tasks)
+                crawled_data.extend([r for r in results if r])
+                
+                # Small cool-down between batches
+                await asyncio.sleep(1)
+
+            await browser.close()
+            
+        print(f"[{self.domain}] Successfully crawled and cleaned {len(crawled_data)} pages via Playwright.")
         
         # Chunking
         all_chunks = []

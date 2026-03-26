@@ -48,27 +48,27 @@ def synthesize_ppt_json(session_dir, company_name):
        - 'subtitle': Generate a powerful, 2-sentence executive summary for the slide header.
     2. NO NUMERIC TIMELINES: ALWAYS use 'Phase 1: Activation', 'Phase 2: Acceleration', 'Phase 3: Authority'.
     3. NO PROJECTED REVENUE: NEVER give specific '$' projections. Use qualitative competitive impact.
-    4. MANDATORY SLIDE STRUCTURE (STRICT):
-       - Slide 1: **COVER SLIDE** (Layout: 'title'). Title: '{company_name} Strategic Growth Audit'. Subtitle: 'Proprietary Growth Architecture for Market Dominance'.
-       - Slide 2: **EXECUTIVE SUMMARY** (Layout: 'bullets'). Title: 'The Opportunity Landscape'. Subtitle: 'Synthesis of current market inefficiencies and your path to authority.'.
-       - Slide 3: **STRATEGIC ROADMAP** (Layout: 'chart'). Title: 'Phased Acceleration Framework'. Visual: 'charts/three_layer_overview.png'.
-       - Slides 4-14: Strategic Deep-Dives (Mix layouts: 'split', 'chart', 'quote', 'bullets').
-       - Slide 15: **PARTNERSHIP & NEXT STEPS** (Layout: 'bullets').
+
+    MANDATORY VISUALS (CSS DIAGRAMS):
+    You MUST select one of these 'visual_type' options for every slide (except 'title' layout):
+    - 'radar': Use for Audit Scorecards. 'visual_data' = list of 5 scores [SEO, AEO, GEO, UI, Trust] (0-100).
+    - 'funnel': Use for Traffic & Conversion flows. 
+    - 'pyramid': Use for Strategy Architecture (SEO/AEO/GEO layers).
+    - 'matrix': Use for Competitive Positioning.
+    - 'image': Use ONLY for 'homepage_screenshot.png' (for UI/CRO slides).
+    
+    MANDATORY SLIDE STRUCTURE (STRICT):
+    - Slide 1: **COVER SLIDE** (Layout: 'title'). Title: '{company_name} Strategic Growth Audit'. Subtitle: 'Proprietary Growth Architecture for Market Dominance'.
+    - Slide 2: **EXECUTIVE SUMMARY** (Layout: 'bullets', Visual: 'radar'). Title: 'The Opportunity Landscape'. Subtitle: 'Synthesis of current market inefficiencies vs future authority.'.
+    - Slide 3: **STRATEGIC ROADMAP** (Layout: 'bullets', Visual: 'pyramid'). Title: 'Phased Acceleration Framework'. Subtitle: 'Building the foundation for sustainable market leadership.'.
+    - Slides 4-14: Strategic Deep-Dives. Mix layouts ('split', 'chart') and visuals ('funnel', 'matrix', 'radar'). Use 'image' (homepage_screenshot.png) sparingly for CRO.
+    - Slide 15: **PARTNERSHIP & NEXT STEPS** (Layout: 'bullets').
     
     --- DATA CONTEXT ---
     BUSINESS: {json.dumps(ba, indent=2)[:3000]}
     STRATEGY: {json.dumps(na, indent=2)[:4000]}
     
-    --- EXACT AVAILABLE VISUAL ASSETS (USE THESE ONLY) ---
-    - charts/search_demand_by_cluster.png (Market Overview)
-    - charts/competitive_landscape.png (Competitor Comparison)
-    - charts/traffic_value_opportunity.png (Commercial Value)
-    - charts/integrated_scorecard.png (Audit Summary)
-    - charts/layer_distribution.png (SEO/AEO/GEO Mix)
-    - charts/three_layer_overview.png (Strategy Framework)
-    - homepage_screenshot.png (CRO/UI Analysis)
-    
-    GENERATE ALL 15 SLIDES. ENSURE LAYOUT DIVERSITY. NO EMPTY SLIDES.
+    GENERATE ALL 15 SLIDES. ENSURE VISUAL DIVERSITY VIA CSS DIAGRAMS. NO EMPTY SLIDES.
     """
     
     print(f"Synthesizing 15-Slide Master Deck via {model_name}...")

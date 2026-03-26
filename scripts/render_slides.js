@@ -52,15 +52,11 @@ async function renderSlides(sessionDir, outputDir) {
             const visualSection = document.getElementById('visual-section');
 
             // Header/Text injection
-            if (titleEl) titleEl.innerText = data.title;
-            if (subtitleEl) subtitleEl.innerText = data.subtitle || '';
-            if (bigTitleEl) bigTitleEl.innerText = data.title;
-            if (bigSubtitleEl) bigSubtitleEl.innerText = data.subtitle || '';
-            if (quoteEl) {
-                quoteEl.innerHTML = data.quote || '';
-                if (!data.quote) quoteEl.style.display = 'none';
-            }
-            if (slideNumEl) slideNumEl.innerText = `SLIDE ${sNum} OF ${sTotal}`;
+            if (titleEl) titleEl.innerText = slide.title || '';
+            if (subtitleEl) subtitleEl.innerText = slide.subtitle || '';
+            if (bigTitleEl) bigTitleEl.innerText = slide.title || '';
+            if (bigSubtitleEl) bigSubtitleEl.innerText = slide.subtitle || '';
+            if (slideNumEl) slideNumEl.innerText = `SLIDE ${String(index + 1).padStart(2, '0')} OF ${totalSlides}`;
 
             // Logo Injection
             if (logoB64 && logoImg) {
@@ -72,23 +68,48 @@ async function renderSlides(sessionDir, outputDir) {
             // Bullets Injection
             if (bulletList) {
                 bulletList.innerHTML = '';
-                (data.bullets || []).forEach(b => {
+                (slide.bullets || []).forEach(b => {
                     const li = document.createElement('li');
                     li.className = 'bullet-item';
                     li.innerHTML = `<div class="bullet-icon"></div><span>${b}</span>`;
                     bulletList.appendChild(li);
                 });
-                if ((data.bullets || []).length === 0) bulletList.style.display = 'none';
+                if ((slide.bullets || []).length === 0) bulletList.style.display = 'none';
             }
 
-            // Visual Section visibility toggle
-            if (data.layout === 'bullets' || data.layout === 'title' || data.layout === 'quote') {
+            // Quote
+            if (quoteEl) {
+                if (slide.quote) {
+                    quoteEl.innerHTML = `<strong>“</strong>${slide.quote}<strong>”</strong>`;
+                    quoteEl.classList.remove('empty');
+                } else {
+                    quoteEl.innerHTML = '';
+                    quoteEl.classList.add('empty');
+                }
+            }
+
+            // VISUAL / DIAGRAM INJECTION
+            // The AI now provides 'visual_type' and 'visual_data' or 'visual' (image path)
+            if (typeof window.renderDiagram === 'function') {
+                if (slide.visual_type && slide.visual_data) {
+                    window.renderDiagram(slide.visual_type, slide.visual_data);
+                } else if (slide.visual) {
+                    // Fallback to image if no diagram type specified
+                    window.renderDiagram('image', slide.visual);
+                } else {
+                    // No visual at all
+                    window.renderDiagram('none');
+                }
+            } else {
+                // Fallback if renderDiagram is not available (e.g., template not loaded correctly)
                 if (visualSection) visualSection.style.display = 'none';
             }
-        }, { data: slide, sNum: slideNum, sTotal: slidesData.length, logoB64: logoBase64 });
 
-        // Handle Image Path Resolution (relative to sessionDir)
-        if (slide.visual) {
+        }, { slide: slide, index: i, company: company, domain: domain, logoB64: logoBase64, totalSlides: slidesData.length });
+
+        // Handle Image Path Resolution (relative to sessionDir) for 'image' type visuals
+        // This needs to happen AFTER the page.evaluate call sets up the visual type
+        if (slide.visual && (!slide.visual_type || slide.visual_type === 'image')) {
             let assetPath = path.join(sessionDir, slide.visual);
             if (fs.existsSync(assetPath)) {
                 const imgData = fs.readFileSync(assetPath).toString('base64');

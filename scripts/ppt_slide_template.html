@@ -130,6 +130,7 @@
             overflow: hidden;
             box-shadow: 0 30px 60px rgba(0,0,0,0.3);
             max-height: 750px;
+            min-height: 600px;
         }
 
         .visual-placeholder {
@@ -140,6 +141,41 @@
             border-radius: 20px;
             transition: transform 0.3s ease;
         }
+
+        /* ENGINEERED CSS DIAGRAMS */
+        .diagram-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; }
+
+        /* 1. Authority Pyramid */
+        .pyramid { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 80%; }
+        .pyramid-tier { 
+            width: var(--w); height: 120px; background: var(--glass); border: 2px solid var(--accent);
+            clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+            display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 28px;
+            color: var(--white); text-transform: uppercase; letter-spacing: 2px;
+            box-shadow: 0 10px 30px rgba(0, 204, 255, 0.2);
+        }
+        .tier-1 { --w: 40%; background: rgba(0, 204, 255, 0.3); clip-path: polygon(50% 0%, 100% 100%, 0% 100%); height: 140px; }
+        .tier-2 { --w: 70%; background: rgba(0, 204, 255, 0.2); }
+        .tier-3 { --w: 100%; background: rgba(0, 204, 255, 0.1); }
+
+        /* 2. Growth Funnel */
+        .funnel { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 70%; }
+        .funnel-step {
+            width: var(--w); height: 100px; background: linear-gradient(90deg, var(--blue), var(--accent));
+            clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%);
+            display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 24px;
+        }
+        .step-1 { --w: 100%; opacity: 1; }
+        .step-2 { --w: 80%; opacity: 0.8; }
+        .step-3 { --w: 60%; opacity: 0.6; }
+        .step-4 { --w: 40%; opacity: 0.4; clip-path: polygon(0% 0%, 100% 0%, 50% 100%, 50% 100%); }
+
+        /* 3. Competitive Matrix */
+        .matrix { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 15px; width: 90%; height: 90%; position: relative; }
+        .matrix-quad { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: rgba(255,255,255,0.5); font-weight: 500; text-transform: uppercase; }
+        .quad-active { background: rgba(0, 204, 255, 0.15); border: 2px solid var(--accent); color: var(--white); transform: scale(1.05); box-shadow: 0 0 40px rgba(0, 204, 255, 0.3); }
+        .matrix-axis-x { position: absolute; bottom: -40px; width: 100%; text-align: center; color: var(--accent); font-weight: 700; letter-spacing: 2px; }
+        .matrix-axis-y { position: absolute; left: -60px; height: 100%; display: flex; align-items: center; writing-mode: vertical-rl; transform: rotate(180deg); color: var(--accent); font-weight: 700; letter-spacing: 2px; }
 
         .bullet-list { 
             list-style: none; 
@@ -212,8 +248,40 @@
                 </div>
             </div>
             <div class="visual-section" id="visual-section">
-                <div id="visual-container" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                    <img src="" class="visual-placeholder" id="visual-img">
+                <div id="visual-container" class="diagram-container">
+                    <!-- 1. IMAGE (Legacy fallback) -->
+                    <img src="" class="visual-placeholder" id="visual-img" style="display:none;">
+
+                    <!-- 2. PYRAMID -->
+                    <div id="diag-pyramid" class="pyramid" style="display:none;">
+                        <div class="pyramid-tier tier-1">GEO Authority</div>
+                        <div class="pyramid-tier tier-2">AEO Optimization</div>
+                        <div class="pyramid-tier tier-3">SEO Foundations</div>
+                    </div>
+
+                    <!-- 3. FUNNEL -->
+                    <div id="diag-funnel" class="funnel" style="display:none;">
+                        <div class="funnel-step step-1">Awareness</div>
+                        <div class="funnel-step step-2">Consideration</div>
+                        <div class="funnel-step step-3">Intention</div>
+                        <div class="funnel-step step-4">Conversion</div>
+                    </div>
+
+                    <!-- 4. MATRIX -->
+                    <div id="diag-matrix" class="matrix" style="display:none;">
+                        <div class="matrix-axis-y">Market Share</div>
+                        <div class="matrix-quad">Traditionalist</div>
+                        <div class="matrix-quad quad-active">Modern Leader</div>
+                        <div class="matrix-quad">Underdog</div>
+                        <div class="matrix-quad">Niche Expert</div>
+                        <div class="matrix-axis-x">AI Readiness</div>
+                    </div>
+
+                    <!-- 5. RADAR (SVG) -->
+                    <div id="diag-radar" style="display:none; width: 600px; height: 600px;">
+                        <svg id="radar-svg" viewBox="0 0 400 400" style="width:100%; height:100%;"></svg>
+                    </div>
+
                     <div id="visual-fallback" style="display: none; width: 70%; height: 70%; border: 2px dashed rgba(255,255,255,0.1); border-radius: 20px; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
                          <p style="font-size: 32px; color: rgba(255,255,255,0.2); font-weight: 800; text-transform: uppercase;">Strategic Insight Asset</p>
                     </div>
@@ -230,5 +298,80 @@
             <p id="slide-num">SLIDE 01 OF 15</p>
         </div>
     </div>
+
+    <script>
+        function drawRadar(scores) {
+            const svg = document.getElementById('radar-svg');
+            const size = 400;
+            const center = size / 2;
+            const radius = 150;
+            const labels = ["SEO", "AEO", "GEO", "UI/UX", "Trust"];
+            const points = [];
+            
+            svg.innerHTML = '';
+            
+            // Draw background polygons
+            for (let i = 1; i <= 5; i++) {
+                const r = (radius / 5) * i;
+                let poly = `<polygon points="`;
+                for (let j = 0; j < 5; j++) {
+                    const angle = (Math.PI * 2 * j) / 5 - Math.PI / 2;
+                    poly += `${center + r * Math.cos(angle)},${center + r * Math.sin(angle)} `;
+                }
+                poly += `" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`;
+                svg.innerHTML += poly;
+            }
+
+            // Draw data polygon
+            let dataPoints = "";
+            for (let j = 0; j < 5; j++) {
+                const angle = (Math.PI * 2 * j) / 5 - Math.PI / 2;
+                const score = (scores[j] || 50) / 100;
+                const x = center + radius * score * Math.cos(angle);
+                const y = center + radius * score * Math.sin(angle);
+                dataPoints += `${x},${y} `;
+                
+                // Labels
+                const lx = center + (radius + 30) * Math.cos(angle);
+                const ly = center + (radius + 20) * Math.sin(angle);
+                svg.innerHTML += `<text x="${lx}" y="${ly}" fill="var(--accent)" font-size="14" text-anchor="middle" font-family="Outfit">${labels[j]}</text>`;
+            }
+            svg.innerHTML += `<polygon points="${dataPoints}" fill="rgba(0, 204, 255, 0.4)" stroke="var(--accent)" stroke-width="3"/>`;
+        }
+
+        window.renderDiagram = function(type, data) {
+            const diags = ['diag-pyramid', 'diag-funnel', 'diag-matrix', 'diag-radar', 'visual-img'];
+            diags.forEach(d => {
+                const el = document.getElementById(d);
+                if (el) el.style.display = 'none';
+            });
+
+            const visualSection = document.getElementById('visual-section');
+            if (visualSection) visualSection.style.display = 'flex';
+            
+            if (type === 'pyramid') {
+                const el = document.getElementById('diag-pyramid');
+                if (el) el.style.display = 'flex';
+            } else if (type === 'funnel') {
+                const el = document.getElementById('diag-funnel');
+                if (el) el.style.display = 'flex';
+            } else if (type === 'matrix') {
+                const el = document.getElementById('diag-matrix');
+                if (el) el.style.display = 'grid';
+            } else if (type === 'radar') {
+                const el = document.getElementById('diag-radar');
+                if (el) el.style.display = 'block';
+                drawRadar(data || [80, 60, 70, 90, 85]);
+            } else if (type === 'image') {
+                const img = document.getElementById('visual-img');
+                if (img) {
+                    img.style.display = 'block';
+                    img.src = data;
+                }
+            } else {
+                if (visualSection) visualSection.style.display = 'none';
+            }
+        };
+    </script>
 </body>
 </html>
