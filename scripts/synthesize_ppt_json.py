@@ -40,7 +40,7 @@ def synthesize_ppt_json(session_dir, company_name):
     
     prompt = f"""
     You are an elite Lead Strategist at Traffic Radius. 
-    Your task is to synthesize the definitive MASTER PRESENTATION for {company_name}.
+    Your task is to synthesize the definitive 15-Slide MASTER PRESENTATION for {company_name}.
     
     TONAL & CONTENT RULES (CRITICAL):
     1. AGENCY-GRADE DETAIL: Each slide must be dense with strategic insight. 
@@ -48,12 +48,12 @@ def synthesize_ppt_json(session_dir, company_name):
        - 'subtitle': Generate a powerful, 2-sentence executive summary for the slide header.
     2. NO NUMERIC TIMELINES: ALWAYS use 'Phase 1: Activation', 'Phase 2: Acceleration', 'Phase 3: Authority'.
     3. NO PROJECTED REVENUE: NEVER give specific '$' projections. Use qualitative competitive impact.
-    4. VISUAL VARIETY (MANDATORY): Do NOT make every slide a bullet list. Use all layout types:
-       - 'title': Large center text (For Intro/Phases).
-       - 'bullets': Standard professional content.
-       - 'split': Bullet list on left, Visual on right.
-       - 'chart': Visual centered and large, with summary subtitle.
-       - 'quote': Large bold quote emphasizing a major opportunity.
+    4. MANDATORY SLIDE STRUCTURE (STRICT):
+       - Slide 1: **COVER SLIDE** (Layout: 'title'). Title: '{company_name} Strategic Growth Audit'. Subtitle: 'Proprietary Growth Architecture for Market Dominance'.
+       - Slide 2: **EXECUTIVE SUMMARY** (Layout: 'bullets'). Title: 'The Opportunity Landscape'. Subtitle: 'Synthesis of current market inefficiencies and your path to authority.'.
+       - Slide 3: **STRATEGIC ROADMAP** (Layout: 'chart'). Title: 'Phased Acceleration Framework'. Visual: 'charts/three_layer_overview.png'.
+       - Slides 4-14: Strategic Deep-Dives (Mix layouts: 'split', 'chart', 'quote', 'bullets').
+       - Slide 15: **PARTNERSHIP & NEXT STEPS** (Layout: 'bullets').
     
     --- DATA CONTEXT ---
     BUSINESS: {json.dumps(ba, indent=2)[:3000]}
@@ -68,7 +68,7 @@ def synthesize_ppt_json(session_dir, company_name):
     - charts/three_layer_overview.png (Strategy Framework)
     - homepage_screenshot.png (CRO/UI Analysis)
     
-    GENERATE ALL 15 SLIDES. ENSURE LAYOUT DIVERSITY.
+    GENERATE ALL 15 SLIDES. ENSURE LAYOUT DIVERSITY. NO EMPTY SLIDES.
     """
     
     print(f"Synthesizing 15-Slide Master Deck via {model_name}...")

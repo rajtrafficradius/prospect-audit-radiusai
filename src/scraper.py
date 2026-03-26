@@ -4,26 +4,36 @@ from playwright.async_api import async_playwright
 from urllib.parse import urljoin, urlparse
 
 async def scrape_page(page, url, retry_count=2):
-    """Scrapes the visible text from a given URL with retry logic for context destruction."""
+    """Scrapes the visible text from a given URL with stealth and Cloudflare-bypass logic."""
     for attempt in range(retry_count + 1):
         try:
             # wait_until="load" is safer for complex sites than domcontentloaded
             await page.goto(url, wait_until="load", timeout=30000)
-            await page.wait_for_timeout(1000) # Settling time
             
+            # Anti-Bot / Cloudflare Challenge Wait
+            print(f" [+] Waiting for {url} to settle (Anti-Bot Challenge)...")
+            await page.wait_for_timeout(6000) # Give 6s for Cloudflare/WAF to bypass
+            
+            # Check for Cloudflare/Cookie gate text
+            content_preview = await page.evaluate("() => document.body ? document.body.innerText.slice(0, 500) : ''")
+            if "checking your browser" in content_preview.lower() or "enable cookies" in content_preview.lower():
+                print(f" [!] Site blocked by security gate. Waiting longer...")
+                await page.wait_for_timeout(5000)
+
             # Extract text safely
             content = await page.evaluate("() => document.body ? document.body.innerText : ''")
-            if content:
+            if len(content.strip()) > 300:
                 return {"url": url, "content": " ".join(content.split())}
                 
-            # Fallback for empty body/rendered content
-            content = await page.content()
-            return {"url": url, "content": content[:5000]} # Limit raw HTML
+            # Fallback for empty body/protected content
+            print(f" [!] Shallow content for {url} ({len(content)} chars). Attempting raw HTML capture...")
+            html_content = await page.content()
+            return {"url": url, "content": html_content[:8000]} # Increase limit for raw HTML
             
         except Exception as e:
             if "context was destroyed" in str(e) and attempt < retry_count:
                 print(f" [!] Context destroyed for {url}, retrying ({attempt+1}/{retry_count})...")
-                await asyncio.sleep(1)
+                await asyncio.sleep(2)
                 continue
             print(f"Error scraping {url}: {e}")
             return {"url": url, "content": ""}
@@ -33,7 +43,7 @@ async def scrape_website_core_pages(base_url, output_dir=None):
     """
     Crawls the homepage and attempts to find/scrape About, Services, and Contact pages.
     Also takes a full-page screenshot of the homepage for Vision CRO analysis.
-    Returns a dictionary of scraped data.
+    Returns a dictionary of scraped data with stealth headers.
     """
     if not base_url.startswith("http"):
         base_url = f"https://{base_url}"
@@ -47,12 +57,22 @@ async def scrape_website_core_pages(base_url, output_dir=None):
     async with async_playwright() as p:
         browser = await p.chromium.launch(
             headless=True,
-            args=["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"]
+            args=[
+                "--no-sandbox", 
+                "--disable-setuid-sandbox", 
+                "--disable-dev-shm-usage",
+                "--disable-blink-features=AutomationControlled" # Stealth
+            ]
         )
-        page = await browser.new_page()
+        # Use realistic headers
+        context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+            viewport={"width": 1920, "height": 1080}
+        )
+        page = await context.new_page()
         
         # Scrape Homepage
-        print(f"Scraping Homepage: {base_url}")
+        print(f"Scraping Homepage (Stealth Mode): {base_url}")
         
         # Take screenshot for Vision Agent
         try:
