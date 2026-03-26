@@ -248,12 +248,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (rawText.includes("[PROGRESS]")) {
             const match = rawText.match(/\[PROGRESS\]\s*([^\|]+)\|\s*(.*)/);
             if (match) {
-                const percent = match[1].trim();
+                const percentStr = match[1].trim();
                 const desc = match[2].trim();
+                const percentInt = parseInt(percentStr);
+                
                 progressContainer.classList.remove('hidden');
-                progressFill.style.width = percent;
-                progressText.innerText = `${percent} | ${desc}`;
-                return; // Do not render PROGRESS tags in terminal directly
+                
+                // Animate progress smoothly
+                const currentWidth = parseFloat(progressFill.style.width) || 0;
+                if (percentInt > currentWidth) {
+                    progressFill.style.width = `${percentInt}%`;
+                }
+                
+                progressText.innerText = `${percentInt}% | ${desc}`;
+                return; 
             }
         }
 
@@ -342,6 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const docxLink = document.getElementById('docxLink');
                 const xlsxLink = document.getElementById('xlsxLink');
                 const pptxLink = document.getElementById('pptxLink');
+                // Use job_id (UUID) as the primary handle
                 if (docxLink) docxLink.href = `/api/download/${jobId}/docx`;
                 if (xlsxLink) xlsxLink.href = `/api/download/${jobId}/xlsx`;
                 if (pptxLink) pptxLink.href = `/api/download/${jobId}/pptx`;

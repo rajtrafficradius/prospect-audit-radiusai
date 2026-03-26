@@ -33,60 +33,45 @@ def synthesize_ppt_json(session_dir, company_name):
         print(f" [!] Data Loading Error: {e}")
         return
 
+    # High-fidelity model for structured strategic output
+    model_name = "gpt-4o-2024-08-06"
+    
     prompt = f"""
-    You are an elite, Senior Strategic Partner at TrafficRadius. 
-    Design a 15-Slide Master Presentation for {company_name}.
-    Your goal is to be POSITIVE, EMPOWERING, and COMMERCIAL.
-    Use the raw audit data to build a narrative of growth and market dominance.
-
-    SLIDE STRUCTURE REQUIRED:
-    1. Cover (Headline)
-    2. The Mission (Core business purpose)
-    3. The Revenue Opportunity (Linking search to dollars)
-    4. Market Performance (Current visibility stats)
-    5. Competitive Dominance (Who are the rivals?)
-    6. Growth Architecture (3-Layer Strategy)
-    7. Technical Core (Lighthouse/Scorecard results)
-    8. AEO Focus (Answer Engines like ChatGPT)
-    9. GEO Logic (Generative Engine citations)
-    10. UX Vision (CRO assessment)
-    11. Content Mastery (The money clusters)
-    12. Entity Authority (E-A-T signals)
-    13. Phase 1 Roadmap (Immediate Growth)
-    14. Phase 2 Roadmap (Market Leadership)
-    15. Investment Impact (Final Summary)
-
-    AVAILABLE VISUAL ASSETS (Use these filenames only in the 'visual' field):
-    --- Dynamic Research Charts (in 'charts/' directory) ---
-    - charts/search_demand_by_cluster.png
-    - charts/competitive_landscape.png
-    - charts/traffic_value_opportunity.png
-    - charts/integrated_scorecard.png
-    - charts/layer_distribution.png
-    - charts/three_layer_overview.png
-
-    --- Strategic Architecture Diagrams (global assets) ---
-    - static/ppt_assets/layer_architecture.png (Best for slide 6)
-
-    DATA:
-    --- Business ---
-    {json.dumps(ba, indent=2)}
-    --- Market ---
-    {json.dumps(mi, indent=2)}
-    --- Audit ---
-    {json.dumps(au, indent=2)}
-    --- Strategy ---
-    {json.dumps(na, indent=2)}
-
-    Return exactly 15 slides. For each slide, choose the most relevant visual asset from the list above. 
-    If none fit, use an empty string. Output exactly 15 slides in the JSON format requested.
+    You are an elite Lead Strategist at Traffic Radius. 
+    Your task is to synthesize the definitive MASTER PRESENTATION for {company_name}.
+    
+    TONAL & CONTENT RULES (CRITICAL):
+    1. AGENCY-GRADE DETAIL: Each slide must be dense with strategic insight. 
+       - 'bullets': Generate 5-7 HIGHLY DETAILED, long-form bullet points (25+ words each).
+       - 'subtitle': Generate a powerful, 2-sentence executive summary for the slide header.
+    2. NO NUMERIC TIMELINES: NEVER use '90 Day', 'Month 1', or specific day-counts.
+       - ALWAYS use 'Phase 1: Activation', 'Phase 2: Acceleration', 'Phase 3: Authority'.
+    3. NO PROJECTED NUMBERS: NEVER give specific revenue or traffic projections (e.g. '$500k ROI'). 
+       - ALWAYS use competitive impact descriptors (e.g. 'Massive Market Shift', 'Transactional Equity Growth').
+    4. POSITIVE & COMMERCIAL: The tone must be exciting and focus on massive opportunities.
+    
+    --- DATA CONTEXT ---
+    BUSINESS: {json.dumps(ba, indent=2)[:2000]}
+    MARKET: {json.dumps(mi, indent=2)[:2000]}
+    AUDIT: {json.dumps(au, indent=2)[:2000]}
+    NARRATIVE: {json.dumps(na, indent=2)[:4000]}
+    
+    --- AVAILABLE VISUAL ASSETS ---
+    - charts/search_demand_by_cluster.png (Use for SEO/Market)
+    - charts/competitive_landscape.png (Use for Competitors)
+    - charts/integrated_health_score.png (Use for Audit/Score)
+    - charts/aeo_readiness_radar.png (Use for AEO/GEO)
+    - charts/backlink_authority_gap.png (Use for Authority)
+    - output/homepage_screenshot.png (Use for CRO)
+    
+    GENERATE ALL 15 SLIDES.
     """
-
-    print("Synthesizing 15-Slide Master Presentation JSON...")
+    
+    print(f"Synthesizing 15-Slide Master Deck via {model_name}...")
     completion = client.beta.chat.completions.parse(
-        model="gpt-4o",
+        model=model_name,
         messages=[
-            {"role": "system", "content": "You are an elite business strategist. You create world-class, revenue-focused presentations."},
+            {"role": "system", "content": "You are a Senior Growth Architect. Your output must be elite, professional, and dense with strategic value."},
             {"role": "user", "content": prompt}
         ],
         response_format=PresentationData,

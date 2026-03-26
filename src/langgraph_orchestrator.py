@@ -41,6 +41,7 @@ class AuditState(TypedDict):
     rag_ready: bool
     strategy_narrative: dict
     errors: List[str]
+    job_id: str
 
 # -------------------------------------------------------------
 # LangGraph Nodes
@@ -259,7 +260,13 @@ def phase_6_deliverables(state: AuditState):
         
         # Safe directory name bridging string cleaning rules
         safe_domain = state["domain"].replace("https://", "").replace("http://", "").replace("/", "_")
-        archive_name = f"{timestamp}_{safe_domain}"
+        # Archive by Job ID if provided, otherwise timestamp
+        job_id = state.get("job_id", timestamp)
+        archive_name = f"{timestamp}_{safe_domain}_{job_id[:8]}" 
+        # Actually, let's use the full job_id as the primary key if it exists
+        if state.get("job_id"):
+            archive_name = state["job_id"]
+            
         archive_dir = os.path.join(project_root, "output", "archives", archive_name)
         os.makedirs(archive_dir, exist_ok=True)
         
@@ -329,7 +336,7 @@ workflow.add_edge("deliverables", END)
 # Compile into an executable AI agent
 app = workflow.compile()
 
-def run_langgraph_pipeline(domain: str, company: str, country: str = "us", custom_out_dir: str = None):
+def run_langgraph_pipeline(domain: str, company: str, country: str = "us", custom_out_dir: str = None, job_id: str = None):
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     
     if custom_out_dir:
@@ -365,8 +372,12 @@ def run_langgraph_pipeline(domain: str, company: str, country: str = "us", custo
         audit_findings={},
         rag_ready=False,
         strategy_narrative={},
-        errors=[]
+        errors=[],
+        job_id=custom_out_dir.split("/")[-1] if custom_out_dir and "sessions" in custom_out_dir else None
     )
+    
+    # If job_id was passed directly as the 5th arg (or 8th in total including python script etc)
+    # Let's check sys.argv logic below first.
     
     print("============================================================")
     print(f" STARTING LANGGRAPH ORCHESTRATOR: {company} ({domain})")
@@ -395,5 +406,6 @@ if __name__ == "__main__":
     company = sys.argv[2]
     country = sys.argv[3] if len(sys.argv) > 3 else "us"
     out_dir = sys.argv[4] if len(sys.argv) > 4 else None
+    job_id = sys.argv[5] if len(sys.argv) > 5 else None
     
-    run_langgraph_pipeline(domain, company, country, out_dir)
+    run_langgraph_pipeline(domain, company, country, out_dir, job_id)

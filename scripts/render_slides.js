@@ -17,9 +17,11 @@ async function renderSlides(sessionDir, outputDir) {
     const browser = await chromium.launch({
         args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
-    const page = await browser.newPage({
-        viewport: { width: 1920, height: 1080 }
-    });
+    const logoPath = path.join(path.dirname(__dirname), 'src', 'static', 'logo.png');
+    let logoBase64 = "";
+    if (fs.existsSync(logoPath)) {
+        logoBase64 = fs.readFileSync(logoPath).toString('base64');
+    }
 
     console.log(`Starting render for ${slidesData.length} slides...`);
 
@@ -30,17 +32,26 @@ async function renderSlides(sessionDir, outputDir) {
         await page.setContent(templateHtml);
 
         // Inject data via DOM manipulation - 100% reliable
-        await page.evaluate(({ data, sNum, sTotal }) => {
+        await page.evaluate(({ data, sNum, sTotal, logoB64 }) => {
             const titleEl = document.getElementById('title');
             const subtitleEl = document.getElementById('subtitle');
             const quoteEl = document.getElementById('quote');
             const slideNumEl = document.getElementById('slide-num');
             const bulletList = document.getElementById('bullets');
+            const logoImg = document.getElementById('logo-img');
+            const logoText = document.getElementById('logo-text');
 
             if (titleEl) titleEl.innerText = data.title;
             if (subtitleEl) subtitleEl.innerText = data.subtitle || '';
             if (quoteEl) quoteEl.innerHTML = data.quote || '';
             if (slideNumEl) slideNumEl.innerText = `SLIDE ${sNum} OF ${sTotal}`;
+
+            // Inject Logo if available
+            if (logoB64 && logoImg) {
+                logoImg.src = `data:image/png;base64,${logoB64}`;
+                logoImg.style.display = 'block';
+                if (logoText) logoText.style.display = 'none';
+            }
 
             if (bulletList) {
                 bulletList.innerHTML = ''; // Clear placeholders
@@ -51,7 +62,7 @@ async function renderSlides(sessionDir, outputDir) {
                     bulletList.appendChild(li);
                 });
             }
-        }, { data: slide, sNum: slideNum, sTotal: slidesData.length });
+        }, { data: slide, sNum: slideNum, sTotal: slidesData.length, logoB64: logoBase64 });
 
         // Visual injection (Charts / Architecture)
         if (slide.visual) {
@@ -77,6 +88,14 @@ async function renderSlides(sessionDir, outputDir) {
                 }, base64Image);
             } else {
                 console.warn(` [!] Warning: Visual not found: ${slide.visual}`);
+                // Fallback UI or Placeholder
+                await page.evaluate(() => {
+                    const visualBox = document.querySelector('.visual-section');
+                    if (visualBox) {
+                        visualBox.style.background = 'linear-gradient(45deg, #1B2A4A, #2E5090)';
+                        visualBox.innerHTML = '<div style="font-size: 32px; color: rgba(255,255,255,0.2); font-weight: 800; text-transform: uppercase; letter-spacing: 5px;">Strategic Vision Asset</div>';
+                    }
+                });
             }
         }
 

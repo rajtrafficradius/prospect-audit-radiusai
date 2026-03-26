@@ -66,7 +66,7 @@ async def run_audit_job(job_id: str, domain: str, company: str):
         env["PYTHONUNBUFFERED"] = "1"
         
         process = await asyncio.create_subprocess_exec(
-            python_exe, "-u", script_path, domain, company, "us", session_dir,
+            python_exe, "-u", script_path, domain, company, "us", session_dir, job_id,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             cwd=project_root_dir, # Run from the project root directory
