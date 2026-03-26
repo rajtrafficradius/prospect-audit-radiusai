@@ -34,7 +34,7 @@ def synthesize_ppt_json(session_dir, company_name):
         return
 
     # High-fidelity model for structured strategic output
-    model_name = "gpt-4o-2024-08-06"
+    model_name = "gpt-4o"
     
     prompt = f"""
     You are an elite Lead Strategist at Traffic Radius. 

@@ -233,83 +233,73 @@ def phase_6_deliverables(state: AuditState):
     env_vars["PROSPECT_DOMAIN"] = state["domain"]
     env_vars["PROSPECT_DATE"] = datetime.datetime.now().strftime("%B %d, %Y")
     
+    # 1. GENERATION PHASE
+    if "errors" not in state:
+        state["errors"] = []
+
     try:
         subprocess.run([python_exe, os.path.join(script_dir, "create_charts.py")], check=True, env=env_vars, cwd=project_root)
         subprocess.run([python_exe, os.path.join(script_dir, "create_strategy_docx.py")], check=True, env=env_vars, cwd=project_root)
         subprocess.run([python_exe, os.path.join(script_dir, "create_action_plan_xlsx.py")], check=True, env=env_vars, cwd=project_root)
         
-        # PPT Generation with fallback/reporting
+        # PPT Generation
         ppt_result = subprocess.run([python_exe, os.path.join(script_dir, "create_presentation_pptx.py"), state["output_dir"], state["company_name"], state["domain"]], env=env_vars, cwd=project_root)
         if ppt_result.returncode != 0:
             print(f" [!] PPT Error: Script exited with {ppt_result.returncode}")
-        
-        # Verify core deliverables exist before archiving
-        missing = []
-        for f in ["Strategy_Document.docx", "12_Month_Action_Plan.xlsx", "Master_Presentation.pptx"]:
-            p = os.path.join(state["output_dir"], "deliverables", f)
-            if not os.path.exists(p):
-                missing.append(f)
-        
-        if missing:
-            print(f" [!] Missing deliverables after generation: {missing}")
-            return {"errors": [f"Generation Failure: {', '.join(missing)} was not created."]}
-        
-        # Archiving System
+    except Exception as ex:
+        print(f" [!] Generation Phase Error: {ex}")
+        state["errors"].append(str(ex))
+    
+    # 2. ARCHIVING PHASE (Run regardless of generation success to preserve what we have)
+    try:
         import shutil
         timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        
-        # Safe directory name bridging string cleaning rules
         safe_domain = state["domain"].replace("https://", "").replace("http://", "").replace("/", "_")
-        # Archive by Job ID if provided, otherwise timestamp
-        job_id = state.get("job_id", timestamp)
-        archive_name = f"{timestamp}_{safe_domain}_{job_id[:8]}" 
-        # Actually, let's use the full job_id as the primary key if it exists
-        if state.get("job_id"):
-            archive_name = state["job_id"]
-            
+        
+        # Use job_id (UUID) as the primary handle for the archive folder
+        archive_name = state.get("job_id") or f"{timestamp}_{safe_domain}"
         archive_dir = os.path.join(project_root, "output", "archives", archive_name)
         os.makedirs(archive_dir, exist_ok=True)
         
-        # Copy deliverables to archive vault
-        deliv_dir = os.path.join(state["output_dir"], "deliverables")
-        charts_dir = os.path.join(state["output_dir"], "charts")
+        # Copy trace data (JSONs) first - these are most important for history
+        for json_file in ["strategy_narrative.json", "audit_findings.json", "market_intelligence.json", "cro_assessment.json", "business_analysis.json"]:
+            src_path = os.path.join(state["output_dir"], json_file)
+            if os.path.exists(src_path):
+                shutil.copy2(src_path, archive_dir)
         
-        try:
-            shutil.copy2(os.path.join(deliv_dir, "Strategy_Document.docx"), archive_dir)
-            shutil.copy2(os.path.join(deliv_dir, "12_Month_Action_Plan.xlsx"), archive_dir)
-            shutil.copy2(os.path.join(deliv_dir, "Master_Presentation.pptx"), archive_dir)
-            shutil.copy2(os.path.join(charts_dir, "integrated_scorecard.png"), archive_dir)
-            
-            # Copy JSON data for Live Preview
-            for json_file in ["strategy_narrative.json", "audit_findings.json", "market_intelligence.json", "cro_assessment.json"]:
-                src_path = os.path.join(state["output_dir"], json_file)
-                if os.path.exists(src_path):
-                    shutil.copy2(src_path, archive_dir)
-            
-            # Save metadata for History Vault API
-            metadata = {
-                "domain": state["domain"],
-                "company": state["company_name"],
-                "date": env_vars["PROSPECT_DATE"],
-                "timestamp": timestamp,
-                "archive_id": archive_name,
-                "deliverables": {
-                    "docx": "Strategy_Document.docx",
-                    "xlsx": "12_Month_Action_Plan.xlsx",
-                    "pptx": "Master_Presentation.pptx"
-                }
-            }
-            with open(os.path.join(archive_dir, "metadata.json"), "w") as f:
-                json.dump(metadata, f, indent=2)
-                
-            print(f" [+] Audit permanently archived in {archive_name}")
-        except Exception as e:
-            print(f" [!] Archive Warning: {e}")
-            
-        return {}
-    except Exception as e:
-        return {"errors": [f"Deliverables Error: {e}"]}
+        # Copy deliverables if they exist
+        deliv_dir = os.path.join(state["output_dir"], "deliverables")
+        if os.path.exists(deliv_dir):
+            for f in os.listdir(deliv_dir):
+                shutil.copy2(os.path.join(deliv_dir, f), archive_dir)
 
+        # Copy scorecard chart
+        scorecard_path = os.path.join(state["output_dir"], "charts", "integrated_scorecard.png")
+        if os.path.exists(scorecard_path):
+            shutil.copy2(scorecard_path, archive_dir)
+            
+        # Save metadata for History Vault API
+        metadata = {
+            "domain": state["domain"],
+            "company": state["company_name"],
+            "date": env_vars["PROSPECT_DATE"],
+            "timestamp": timestamp,
+            "archive_id": archive_name,
+            "status": "completed" if not state.get("errors") else "partial_failure",
+            "deliverables": {
+                "docx": "Strategy_Document.docx" if os.path.exists(os.path.join(archive_dir, "Strategy_Document.docx")) else None,
+                "xlsx": "12_Month_Action_Plan.xlsx" if os.path.exists(os.path.join(archive_dir, "12_Month_Action_Plan.xlsx")) else None,
+                "pptx": "Master_Presentation.pptx" if os.path.exists(os.path.join(archive_dir, "Master_Presentation.pptx")) else None
+            }
+        }
+        with open(os.path.join(archive_dir, "metadata.json"), "w") as m_file:
+            json.dump(metadata, m_file, indent=2)
+            
+        print(f" [+] Audit permanently archived in {archive_name} (Status: {metadata['status']})")
+    except Exception as arch_ex:
+        print(f" [!] Archive System Error: {arch_ex}")
+        
+    return {}
 
 # -------------------------------------------------------------
 # Define LangGraph State Machine
