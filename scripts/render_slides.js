@@ -105,16 +105,24 @@ async function renderSlides(sessionDir, outputDir) {
 
         // Handle Image Path Resolution (relative to sessionDir) for 'image' type visuals
         // This needs to happen AFTER the page.evaluate call sets up the visual type
-        if (slide.visual && (!slide.visual_type || slide.visual_type === 'image')) {
+        // Handle Image Path Resolution (Only if type is image/undefined and visual is provided)
+        const isDiagram = ['radar', 'pyramid', 'funnel', 'matrix'].includes(slide.visual_type);
+        
+        if (!isDiagram && slide.visual) {
             let assetPath = path.join(sessionDir, slide.visual);
             if (fs.existsSync(assetPath)) {
                 const imgData = fs.readFileSync(assetPath).toString('base64');
                 await page.evaluate(({ b64 }) => {
                     const img = document.getElementById('visual-img');
-                    if (img) img.src = `data:image/png;base64,${b64}`;
+                    if (img) {
+                        img.src = `data:image/png;base64,${b64}`;
+                        img.style.display = 'block';
+                    }
+                    const fb = document.getElementById('visual-fallback');
+                    if (fb) fb.style.display = 'none';
                 }, { b64: imgData });
             } else {
-                console.warn(` [!] Warning: Visual not found: ${slide.visual}`);
+                console.warn(` [!] Warning: Visual asset not found: ${slide.visual}`);
                 await page.evaluate(() => {
                     const img = document.getElementById('visual-img');
                     const fb = document.getElementById('visual-fallback');
@@ -122,6 +130,12 @@ async function renderSlides(sessionDir, outputDir) {
                     if (fb) fb.style.display = 'flex';
                 });
             }
+        } else if (!isDiagram && !slide.visual) {
+            // No visual provided and not a diagram - ensure fallback is hidden unless it's a layout that needs it
+            await page.evaluate(() => {
+                const fb = document.getElementById('visual-fallback');
+                if (fb) fb.style.display = 'none';
+            });
         }
 
         await page.waitForLoadState('networkidle');
