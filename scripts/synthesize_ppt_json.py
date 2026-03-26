@@ -27,13 +27,21 @@ def synthesize_ppt_json(session_dir, company_name):
     client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
     
     # Load all audit data
-    try:
-        with open(os.path.join(session_dir, "business_analysis.json")) as f: ba = json.load(f)
-        with open(os.path.join(session_dir, "market_intelligence.json")) as f: mi = json.load(f)
-        with open(os.path.join(session_dir, "audit_findings.json")) as f: au = json.load(f)
-        with open(os.path.join(session_dir, "strategy_narrative.json")) as f: na = json.load(f)
-    except Exception as e:
-        print(f" [!] Data Loading Error: {e}")
+    # Load all audit data with graceful fallbacks
+    def load_json_safe(filename, default=None):
+        path = os.path.join(session_dir, filename)
+        if os.path.exists(path):
+            with open(path) as f:
+                return json.load(f)
+        return default if default is not None else {}
+
+    ba = load_json_safe("business_analysis.json")
+    mi = load_json_safe("market_intelligence.json")
+    au = load_json_safe("audit_findings.json")
+    na = load_json_safe("strategy_narrative.json")
+    
+    if not ba and not na:
+        print(" [!] Critical Data Missing: Cannot synthesize PPT without Business Analysis or Strategy Narrative.")
         return
 
     # High-fidelity model for structured strategic output

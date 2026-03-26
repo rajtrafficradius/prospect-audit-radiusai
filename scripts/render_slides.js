@@ -37,19 +37,30 @@ async function renderSlides(sessionDir, outputDir) {
 
         // Inject data via DOM manipulation
         await page.evaluate(({ slide, index, totalSlides, logoB64 }) => {
-            // 1. Layout Selection
-            document.body.className = `layout-${slide.layout || 'split'}`;
+            // 1. Layout Selection & Visibility
+            const layout = slide.layout || 'split';
+            document.body.className = `layout-${layout}`;
             
             const titleEl = document.getElementById('title');
             const subtitleEl = document.getElementById('subtitle');
             const bigTitleEl = document.getElementById('big-title');
             const bigSubtitleEl = document.getElementById('big-subtitle');
+            const titleLayoutCenter = document.getElementById('title-layout-center');
             const quoteEl = document.getElementById('quote');
             const slideNumEl = document.getElementById('slide-num');
             const bulletList = document.getElementById('bullets');
             const logoImg = document.getElementById('logo-img');
             const logoText = document.getElementById('logo-text');
             const visualSection = document.getElementById('visual-section');
+            const footer = document.querySelector('.slide-footer');
+
+            // Toggle Title Layout Container
+            if (titleLayoutCenter) {
+                titleLayoutCenter.style.display = (layout === 'title') ? 'flex' : 'none';
+            }
+            if (footer) {
+                footer.style.display = (layout === 'title') ? 'none' : 'flex';
+            }
 
             // Header/Text injection
             if (titleEl) titleEl.innerText = slide.title || '';
@@ -65,16 +76,25 @@ async function renderSlides(sessionDir, outputDir) {
                 if (logoText) logoText.style.display = 'none';
             }
 
-            // Bullets Injection
+            // Bullets Injection with Auto-Scaling
             if (bulletList) {
                 bulletList.innerHTML = '';
-                (slide.bullets || []).forEach(b => {
+                const bullets = (slide.bullets || []);
+                bullets.forEach(b => {
                     const li = document.createElement('li');
                     li.className = 'bullet-item';
                     li.innerHTML = `<div class="bullet-icon"></div><span>${b}</span>`;
                     bulletList.appendChild(li);
                 });
-                if ((slide.bullets || []).length === 0) bulletList.style.display = 'none';
+                if (bullets.length === 0) {
+                    bulletList.style.display = 'none';
+                } else if (bullets.length > 6) {
+                    bulletList.style.fontSize = '24px'; // Scale down for many bullets
+                    bulletList.style.gap = '15px';
+                } else {
+                    bulletList.style.fontSize = '30px';
+                    bulletList.style.gap = '25px';
+                }
             }
 
             // Quote
