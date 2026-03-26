@@ -17,6 +17,10 @@ async function renderSlides(sessionDir, outputDir) {
     const browser = await chromium.launch({
         args: ['--no-sandbox', '--disable-setuid-sandbox']
     });
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await page.setViewportSize({ width: 1280, height: 720 }); // Standard PPT aspect ratio
+
     const logoPath = path.join(path.dirname(__dirname), 'src', 'static', 'logo.png');
     let logoBase64 = "";
     if (fs.existsSync(logoPath)) {

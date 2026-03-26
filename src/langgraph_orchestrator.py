@@ -245,10 +245,12 @@ def phase_6_deliverables(state: AuditState):
         # PPT Generation
         ppt_result = subprocess.run([python_exe, os.path.join(script_dir, "create_presentation_pptx.py"), state["output_dir"], state["company_name"], state["domain"]], env=env_vars, cwd=project_root)
         if ppt_result.returncode != 0:
-            print(f" [!] PPT Error: Script exited with {ppt_result.returncode}")
-    except Exception as ex:
-        print(f" [!] Generation Phase Error: {ex}")
-        state["errors"].append(str(ex))
+            err_msg = f"PPT Generation Script failed with return code {ppt_result.returncode}"
+            print(f" [!] {err_msg}")
+            state["errors"].append(err_msg)
+    except Exception as gen_ex:
+        print(f" [!] Generation Phase Error: {gen_ex}")
+        state["errors"].append(str(gen_ex))
     
     # 2. ARCHIVING PHASE (Run regardless of generation success to preserve what we have)
     try:
