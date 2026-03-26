@@ -164,7 +164,7 @@ async def stream_logs(job_id: str):
 
 @app.get("/api/download/{job_id}/{file_type}")
 async def download_file(job_id: str, file_type: str):
-    """Securely serves deliverables for download."""
+    """Securely serves deliverables with multi-path fallback."""
     session_dir = os.path.join(OUTPUT_DIR, "sessions", job_id)
     file_map = {
         "docx": "deliverables/Strategy_Document.docx",
@@ -176,18 +176,42 @@ async def download_file(job_id: str, file_type: str):
     if file_type not in file_map:
         return JSONResponse({"error": "Invalid file type"}, status_code=400)
     
+    # 1. Try Session Directory (Active Run)
     file_path = os.path.join(session_dir, file_map[file_type])
     
-    # If not in session, check if job_id is actually an archive_id
+    # 2. Try Archive Directory (History Vault)
     if not os.path.exists(file_path):
         archives_dir = os.path.join(OUTPUT_DIR, "archives")
-        # Check if job_id directly exists as a folder in archives
+        # UUID Match
         archive_path = os.path.join(archives_dir, job_id, os.path.basename(file_map[file_type]))
+        
         if os.path.exists(archive_path):
             file_path = archive_path
         else:
-            print(f" [!] File not found for download: job_id={job_id}, type={file_type}, tried={session_dir} and {archive_path}")
-            return JSONResponse({"error": "File not found"}, status_code=404)
+            # Timestamp Fallback (Scan all folders for a match)
+            # Some audits are named YYYYMMDD_HHMMSS_domain
+            print(f" [!] Job-specific archive not found for {job_id}. Scanning vault fallbacks...")
+            found_fallback = False
+            if os.path.exists(archives_dir):
+                for folder in os.listdir(archives_dir):
+                    # Check if the metadata inside this folder matches our job_id
+                    meta_path = os.path.join(archives_dir, folder, "metadata.json")
+                    if os.path.exists(meta_path):
+                        try:
+                            with open(meta_path, "r") as f:
+                                meta = json.load(f)
+                                if meta.get("archive_id") == job_id:
+                                    # This is the one!
+                                    target_p = os.path.join(archives_dir, folder, os.path.basename(file_map[file_type]))
+                                    if os.path.exists(target_p):
+                                        file_path = target_p
+                                        found_fallback = True
+                                        break
+                        except: pass
+            
+            if not found_fallback:
+                print(f" [!] CRITICAL: PPTX download failed. job_id={job_id}, type={file_type}. Not in sessions or archives.")
+                return JSONResponse({"error": "File not found"}, status_code=404)
             
     print(f" [+] Serving download: {file_path}")
         

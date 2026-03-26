@@ -192,7 +192,7 @@ class DeepCrawlerRAG:
         
         if not all_chunks:
             print("No text chunks generated. Aborting RAG build.")
-            return
+            return False
 
         # Get embeddings in batches (OpenAI allows max 2048 at a time usually, we do 500)
         embeddings = []
@@ -214,6 +214,7 @@ class DeepCrawlerRAG:
             json.dump(all_chunks, f)
             
         print(f"[{self.domain}] Vector Database built and saved to {self.output_dir}.")
+        return True
 
     def query_knowledge_base(self, query: str, top_k: int = 5) -> list:
         """Retrieves and returns the most relevant chunks from the site for the given query."""

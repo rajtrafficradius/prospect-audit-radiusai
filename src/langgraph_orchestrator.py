@@ -191,10 +191,13 @@ def phase_4_deep_rag(state: AuditState):
     try:
         import asyncio
         rag = DeepCrawlerRAG(state["domain"], state["output_dir"], max_pages=50)
-        asyncio.run(rag.build_index())
-        return {"rag_ready": True}
+        success = asyncio.run(rag.build_index())
+        if success:
+            return {"rag_ready": True}
+        else:
+            return {"errors": ["RAG Build Aborted: No relevant content found."]}
     except Exception as e:
-        return {"errors": [f"RAG Error: {e}"]}
+        return {"errors": [f"RAG Error: {str(e)}"]}
 
 def phase_5_strategy_synthesis(state: AuditState):
     print("\n--- [Node] Phase 5: GPT-4o AEO Strategy Synthesis ---")
@@ -351,42 +354,51 @@ def run_langgraph_pipeline(domain: str, company: str, country: str = "us", custo
         elif clean_domain.endswith(".nz") or clean_domain.endswith(".co.nz"): country = "nz"
         elif clean_domain.endswith(".in") or clean_domain.endswith(".co.in"): country = "in"
     
-    initial_state = AuditState(
-        domain=clean_domain,
-        company_name=company,
-        target_country=country,
-        output_dir=out_dir,
-        scraped_data=[],
-        business_analysis={},
-        cro_assessment={},
-        market_intelligence={},
-        competitor_shadowing={},
-        audit_findings={},
-        rag_ready=False,
-        strategy_narrative={},
-        errors=[],
-        job_id=job_id or (custom_out_dir.split("/")[-1] if custom_out_dir and "sessions" in custom_out_dir else None)
-    )
+    # Initial State Initialization (Ensure Job ID is definitely set)
+    # Note: Using a dict as the starting point for LangGraph state
+    resolved_job_id = job_id or (out_dir.split("/")[-1] if out_dir and "sessions" in out_dir else f"job_{int(datetime.datetime.now().timestamp())}")
     
-    # If job_id was passed directly as the 5th arg (or 8th in total including python script etc)
-    # Let's check sys.argv logic below first.
+    initial_state = {
+        "domain": clean_domain,
+        "company_name": company,
+        "target_country": country,
+        "output_dir": out_dir,
+        "scraped_data": [],
+        "business_analysis": {},
+        "cro_assessment": {},
+        "market_intelligence": {},
+        "competitor_shadowing": {},
+        "audit_findings": {},
+        "rag_ready": False,
+        "strategy_narrative": {},
+        "errors": [],
+        "job_id": resolved_job_id
+    }
     
     print("============================================================")
     print(f" STARTING LANGGRAPH ORCHESTRATOR: {company} ({domain})")
+    print(f" JOB ID: {resolved_job_id}")
     print("============================================================")
     print("[PROGRESS] 5% | Booting Agentic Swarm...")
     
     config = {"recursion_limit": 50}
     
+    pipeline_failed = False
     for event in app.stream(initial_state, config):
         for node_name, state_update in event.items():
             if state_update is not None and state_update.get("errors"):
                 print(f" [!] Error in {node_name}: {state_update['errors']}")
+                pipeline_failed = True
             else:
                 print(f" [+] {node_name} completed successfully.")
                 
-    print("\n✅ Enterprise Pipeline Run Complete. Review the output/ folder.")
-    print("[PROGRESS] 100% | Setup Complete!")
+    if pipeline_failed:
+        print("\n [!] Enterprise Pipeline finished with ERRORS. Some deliverables may be missing.")
+        sys.exit(1)
+    else:
+        print("\n✅ Enterprise Pipeline Run Complete. Review the output/ folder.")
+        print("[PROGRESS] 100% | Setup Complete!")
+        sys.exit(0)
 
 if __name__ == "__main__":
     import sys
