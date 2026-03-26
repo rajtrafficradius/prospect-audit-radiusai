@@ -40,18 +40,18 @@
         /* Ambient Background Gradients */
         .ambient-glow {
             position: absolute;
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, rgba(46, 80, 144, 0.3) 0%, rgba(27, 42, 74, 0) 70%);
+            width: 1000px;
+            height: 1000px;
+            background: radial-gradient(circle, rgba(46, 80, 144, 0.35) 0%, rgba(27, 42, 74, 0) 75%);
             z-index: 0;
             pointer-events: none;
         }
-        .glow-tr { top: -200px; right: -200px; }
-        .glow-bl { bottom: -200px; left: -200px; }
+        .glow-tr { top: -300px; right: -300px; }
+        .glow-bl { bottom: -300px; left: -300px; }
 
         .slide-container {
-            width: 1700px;
-            height: 880px;
+            width: 1720px;
+            height: 900px;
             z-index: 10;
             display: flex;
             flex-direction: column;
@@ -63,9 +63,9 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            margin-bottom: 60px;
+            margin-bottom: 50px;
             border-bottom: 2px solid var(--glass-border);
-            padding-bottom: 20px;
+            padding-bottom: 25px;
         }
 
         .slide-title {
@@ -74,203 +74,153 @@
             font-size: 72px;
             letter-spacing: -1.5px;
             text-transform: uppercase;
-            background: linear-gradient(135deg, #FFF 0%, #CCC 100%);
+            background: linear-gradient(135deg, #FFF 0%, #AAA 100%);
             -webkit-background-clip: text;
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
         .slide-subtitle {
-            font-size: 24px;
+            font-size: 26px;
             color: var(--accent);
             font-weight: 400;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             text-transform: uppercase;
+            margin-bottom: 5px;
         }
 
-        /* Content Grid */
+        /* Content Grid System */
         .content-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
+            gap: 50px;
             flex-grow: 1;
+            transition: all 0.5s ease;
         }
 
-        .text-section {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
+        /* LAYOUT VARIATIONS */
+        .layout-bullets .content-grid { grid-template-columns: 1fr; }
+        .layout-bullets .visual-section { display: none; }
 
+        .layout-split .content-grid { grid-template-columns: 1fr 1fr; }
+
+        .layout-chart .content-grid { grid-template-columns: 0.8fr 1.2fr; }
+
+        .layout-title .content-grid { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .layout-title .slide-header, .layout-title .visual-section, .layout-title .bullet-list { display: none; }
+        .layout-title .big-title-h1 { font-size: 140px; font-weight: 800; font-family: 'Outfit'; color: var(--white); text-transform: uppercase; line-height: 1; margin-bottom: 20px; }
+        .layout-title .big-subtitle-p { font-size: 42px; color: var(--accent); letter-spacing: 5px; text-transform: uppercase; }
+
+        .layout-quote .content-grid { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .layout-quote .visual-section, .layout-quote .bullet-list { display: none; }
+        .layout-quote .impact-quote { font-size: 82px; border: none; padding: 0; margin: 0; max-width: 1400px; line-height: 1.1; }
+
+        /* Component Styles */
+        .text-section { display: flex; flex-direction: column; justify-content: flex-start; gap: 35px; }
+        
         .visual-section {
             background: var(--glass);
             border: 1px solid var(--glass-border);
             backdrop-filter: var(--glass-blur);
-            border-radius: 30px;
+            border-radius: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px;
+            padding: 50px;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
         }
 
         .visual-placeholder {
             width: 100%;
             height: 100%;
             object-fit: contain;
-            border-radius: 15px;
+            border-radius: 20px;
+            transition: transform 0.3s ease;
         }
 
-        /* Bullet Points with Style */
-        .bullet-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
-        .bullet-item {
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
-            font-size: 32px;
-            line-height: 1.4;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
+        .bullet-list { list-style: none; display: flex; flex-direction: column; gap: 30px; }
+        .bullet-item { display: flex; gap: 25px; align-items: flex-start; font-size: 34px; line-height: 1.4; color: rgba(255, 255, 255, 0.9); }
         .bullet-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--accent);
-            border-radius: 10px;
-            flex-shrink: 0;
-            margin-top: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 0 15px rgba(0, 204, 255, 0.4);
+            width: 45px; height: 45px; background: linear-gradient(135deg, var(--accent), var(--blue));
+            border-radius: 12px; flex-shrink: 0; margin-top: 5px; display: flex;
+            align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0, 204, 255, 0.4);
         }
 
-        /* Large Impact Quote */
         .impact-quote {
-            font-family: 'Outfit', sans-serif;
-            font-size: 48px;
-            font-weight: 300;
-            border-left: 6px solid var(--gold);
-            padding-left: 30px;
-            margin: 40px 0;
-            color: #DDD;
+            font-family: 'Outfit', sans-serif; font-size: 54px; font-weight: 300; border-left: 8px solid var(--gold);
+            padding-left: 40px; margin-top: 20px; color: #EEE; transition: all 0.3s ease;
         }
-
-        .impact-quote strong {
-            color: var(--gold);
-            font-weight: 700;
-        }
+        .impact-quote strong { color: var(--gold); font-weight: 700; }
 
         /* Footer Info */
         .slide-footer {
-            position: absolute;
-            bottom: -60px;
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            font-size: 18px;
-            color: rgba(255, 255, 255, 0.4);
-            letter-spacing: 1px;
+            position: absolute; bottom: -80px; width: 100%; display: flex;
+            justify-content: space-between; font-size: 20px; color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 2px;
         }
 
-        /* Cover Slide Specifics */
-        .cover-slide {
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .cover-tagline {
-            font-size: 32px;
-            font-weight: 300;
-            color: var(--accent);
-            margin-bottom: 20px;
-            letter-spacing: 5px;
-        }
-
-        .cover-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 120px;
-            font-weight: 800;
-            margin-bottom: 40px;
-            line-height: 0.9;
-        }
-
-        .cover-detail {
-            font-size: 28px;
-            color: var(--gold);
-            font-weight: 500;
-        }
-
-        /* Utility for different layouts */
-        .layout-full { grid-template-columns: 1fr; }
-        .layout-split { grid-template-columns: 1fr 1fr; }
-        .layout-reverse { grid-template-columns: 1.2fr 1fr; direction: rtl; }
-        .layout-reverse > * { direction: ltr; }
+        /* Hide elements if empty */
+        .empty { display: none !important; }
 
     </style>
 </head>
-<body>
+<body class="layout-split">
     <div class="ambient-glow glow-tr"></div>
     <div class="ambient-glow glow-bl"></div>
 
     <div class="slide-container" id="slide">
-        <!-- HEADER -->
-        <div class="slide-header">
-            <div>
+        <!-- HEADER (Hidden in Title Layout) -->
+        <div class="slide-header" id="header">
+            <div style="max-width: 1200px;">
                 <p class="slide-subtitle" id="subtitle">MARKET INTELLIGENCE & GAP ANALYSIS</p>
                 <h1 class="slide-title" id="title">Competitive Dominance</h1>
             </div>
-            <div style="text-align: right;">
-                <img id="logo-img" src="" style="height: 60px; display: none;">
+            <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
+                <img id="logo-img" src="" style="height: 70px; display: none; margin-bottom: 10px;">
                 <div id="logo-text">
-                    <p style="color: var(--accent); font-weight: 800; font-size: 24px;">TRAFFIC RADIUS</p>
-                    <p style="font-size: 14px; color: #666;">GROWTH ARCHITECTURE</p>
+                    <p style="color: var(--accent); font-weight: 800; font-size: 26px; letter-spacing: 2px;">TRAFFIC RADIUS</p>
+                    <p style="font-size: 14px; color: #AAA; letter-spacing: 1px;">STRATEGY ARCHITECT</p>
                 </div>
             </div>
         </div>
 
         <!-- CONTENT -->
         <div class="content-grid" id="content-grid">
-            <div class="text-section">
+            <!-- Center Content for Title Layout -->
+            <div id="title-layout-center" style="display: none; padding-bottom: 100px;">
+                <h1 class="big-title-h1" id="big-title">PHASE 1: ACTIVATION</h1>
+                <p class="big-subtitle-p" id="big-subtitle">Establishing The Authority Foundation</p>
+            </div>
+
+            <!-- Standard Sections -->
+            <div class="text-section" id="text-section">
                 <ul class="bullet-list" id="bullets">
-                    <li class="bullet-item">
-                        <div class="bullet-icon"></div>
-                        <span>Primary market rival <strong>CompetitorX</strong> currently captures 45% of high-intent search share.</span>
-                    </li>
-                    <li class="bullet-item">
-                        <div class="bullet-icon"></div>
-                        <span>Significant opportunity identified in the <strong>Furniture Category</strong> for transactional long-tail keywords.</span>
-                    </li>
-                    <li class="bullet-item">
-                        <div class="bullet-icon"></div>
-                        <span>Our AEO strategy will out-position competitors in AI-driven answer engines like ChatGPT and Perplexity.</span>
-                    </li>
+                    <!-- Bullets injected here -->
                 </ul>
                 <div class="impact-quote" id="quote">
-                    "Search is evolving from <strong>Links</strong> to <strong>Answers</strong>. This is your first-mover advantage."
+                    <!-- Quote injected here -->
                 </div>
             </div>
-            <div class="visual-section">
-                <!-- Visuals will be injected here (Charts/AI Diagrams) -->
-                <img src="https://via.placeholder.com/800x600/1B2A4A/00CCFF?text=Data+Visualization" class="visual-placeholder" id="visual">
+            <div class="visual-section" id="visual-section">
+                <div id="visual-container" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                    <img src="" class="visual-placeholder" id="visual-img">
+                    <div id="visual-fallback" style="display: none; width: 70%; height: 70%; border: 2px dashed rgba(255,255,255,0.1); border-radius: 20px; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+                         <p style="font-size: 32px; color: rgba(255,255,255,0.2); font-weight: 800; text-transform: uppercase;">Strategic Insight Asset</p>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- FOOTER -->
         <div class="slide-footer">
-            <p>CONFIDENTIAL STRATEGY | © 2026 TRAFFIC RADIUS</p>
+            <div style="display: flex; gap: 30px;">
+                <p>CONFIDENTIAL STRATEGY</p>
+                <p style="color: var(--gold); border-left: 1px solid rgba(255,255,255,0.2); padding-left: 30px;">© 2026 TRAFFIC RADIUS</p>
+            </div>
             <p id="slide-num">SLIDE 01 OF 15</p>
         </div>
     </div>
 </body>
+</html>
 </html>

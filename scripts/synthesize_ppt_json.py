@@ -15,9 +15,11 @@ class Slide(BaseModel):
     subtitle: Optional[str] = ""
     bullets: List[str] = Field(default_factory=list)
     quote: Optional[str] = ""
-    visual: Optional[str] = Field(None, description="Filename of a chart or visual asset, e.g. 'charts/integrated_scorecard.png'")
+    visual: Optional[str] = Field(None, description="Filename of a chart or visual asset.")
+    layout: str = Field("bullets", description="Layout choice: 'title', 'bullets', 'split', 'chart', 'quote'")
 
 class PresentationData(BaseModel):
+    presentation_title: str
     slides: List[Slide]
 
 def synthesize_ppt_json(session_dir, company_name):
@@ -44,27 +46,29 @@ def synthesize_ppt_json(session_dir, company_name):
     1. AGENCY-GRADE DETAIL: Each slide must be dense with strategic insight. 
        - 'bullets': Generate 5-7 HIGHLY DETAILED, long-form bullet points (25+ words each).
        - 'subtitle': Generate a powerful, 2-sentence executive summary for the slide header.
-    2. NO NUMERIC TIMELINES: NEVER use '90 Day', 'Month 1', or specific day-counts.
-       - ALWAYS use 'Phase 1: Activation', 'Phase 2: Acceleration', 'Phase 3: Authority'.
-    3. NO PROJECTED NUMBERS: NEVER give specific revenue or traffic projections (e.g. '$500k ROI'). 
-       - ALWAYS use competitive impact descriptors (e.g. 'Massive Market Shift', 'Transactional Equity Growth').
-    4. POSITIVE & COMMERCIAL: The tone must be exciting and focus on massive opportunities.
+    2. NO NUMERIC TIMELINES: ALWAYS use 'Phase 1: Activation', 'Phase 2: Acceleration', 'Phase 3: Authority'.
+    3. NO PROJECTED REVENUE: NEVER give specific '$' projections. Use qualitative competitive impact.
+    4. VISUAL VARIETY (MANDATORY): Do NOT make every slide a bullet list. Use all layout types:
+       - 'title': Large center text (For Intro/Phases).
+       - 'bullets': Standard professional content.
+       - 'split': Bullet list on left, Visual on right.
+       - 'chart': Visual centered and large, with summary subtitle.
+       - 'quote': Large bold quote emphasizing a major opportunity.
     
     --- DATA CONTEXT ---
-    BUSINESS: {json.dumps(ba, indent=2)[:2000]}
-    MARKET: {json.dumps(mi, indent=2)[:2000]}
-    AUDIT: {json.dumps(au, indent=2)[:2000]}
-    NARRATIVE: {json.dumps(na, indent=2)[:4000]}
+    BUSINESS: {json.dumps(ba, indent=2)[:3000]}
+    STRATEGY: {json.dumps(na, indent=2)[:4000]}
     
-    --- AVAILABLE VISUAL ASSETS ---
-    - charts/search_demand_by_cluster.png (Use for SEO/Market)
-    - charts/competitive_landscape.png (Use for Competitors)
-    - charts/integrated_health_score.png (Use for Audit/Score)
-    - charts/aeo_readiness_radar.png (Use for AEO/GEO)
-    - charts/backlink_authority_gap.png (Use for Authority)
-    - output/homepage_screenshot.png (Use for CRO)
+    --- EXACT AVAILABLE VISUAL ASSETS (USE THESE ONLY) ---
+    - charts/search_demand_by_cluster.png (Market Overview)
+    - charts/competitive_landscape.png (Competitor Comparison)
+    - charts/traffic_value_opportunity.png (Commercial Value)
+    - charts/integrated_scorecard.png (Audit Summary)
+    - charts/layer_distribution.png (SEO/AEO/GEO Mix)
+    - charts/three_layer_overview.png (Strategy Framework)
+    - homepage_screenshot.png (CRO/UI Analysis)
     
-    GENERATE ALL 15 SLIDES.
+    GENERATE ALL 15 SLIDES. ENSURE LAYOUT DIVERSITY.
     """
     
     print(f"Synthesizing 15-Slide Master Deck via {model_name}...")

@@ -35,70 +35,74 @@ async function renderSlides(sessionDir, outputDir) {
         
         await page.setContent(templateHtml);
 
-        // Inject data via DOM manipulation - 100% reliable
+        // Inject data via DOM manipulation
         await page.evaluate(({ data, sNum, sTotal, logoB64 }) => {
+            // 1. Layout Selection
+            document.body.className = `layout-${data.layout || 'split'}`;
+            
             const titleEl = document.getElementById('title');
             const subtitleEl = document.getElementById('subtitle');
+            const bigTitleEl = document.getElementById('big-title');
+            const bigSubtitleEl = document.getElementById('big-subtitle');
             const quoteEl = document.getElementById('quote');
             const slideNumEl = document.getElementById('slide-num');
             const bulletList = document.getElementById('bullets');
             const logoImg = document.getElementById('logo-img');
             const logoText = document.getElementById('logo-text');
+            const visualSection = document.getElementById('visual-section');
 
+            // Header/Text injection
             if (titleEl) titleEl.innerText = data.title;
             if (subtitleEl) subtitleEl.innerText = data.subtitle || '';
-            if (quoteEl) quoteEl.innerHTML = data.quote || '';
+            if (bigTitleEl) bigTitleEl.innerText = data.title;
+            if (bigSubtitleEl) bigSubtitleEl.innerText = data.subtitle || '';
+            if (quoteEl) {
+                quoteEl.innerHTML = data.quote || '';
+                if (!data.quote) quoteEl.style.display = 'none';
+            }
             if (slideNumEl) slideNumEl.innerText = `SLIDE ${sNum} OF ${sTotal}`;
 
-            // Inject Logo if available
+            // Logo Injection
             if (logoB64 && logoImg) {
                 logoImg.src = `data:image/png;base64,${logoB64}`;
                 logoImg.style.display = 'block';
                 if (logoText) logoText.style.display = 'none';
             }
 
+            // Bullets Injection
             if (bulletList) {
-                bulletList.innerHTML = ''; // Clear placeholders
+                bulletList.innerHTML = '';
                 (data.bullets || []).forEach(b => {
                     const li = document.createElement('li');
                     li.className = 'bullet-item';
                     li.innerHTML = `<div class="bullet-icon"></div><span>${b}</span>`;
                     bulletList.appendChild(li);
                 });
+                if ((data.bullets || []).length === 0) bulletList.style.display = 'none';
+            }
+
+            // Visual Section visibility toggle
+            if (data.layout === 'bullets' || data.layout === 'title' || data.layout === 'quote') {
+                if (visualSection) visualSection.style.display = 'none';
             }
         }, { data: slide, sNum: slideNum, sTotal: slidesData.length, logoB64: logoBase64 });
 
-        // Visual injection (Charts / Architecture)
+        // Handle Image Path Resolution (relative to sessionDir)
         if (slide.visual) {
-            let visualPath = "";
-            const sessionPath = path.join(sessionDir, slide.visual);
-            const projectRoot = path.dirname(__dirname);
-            const rootStaticPath = path.join(projectRoot, "src", "static", "ppt_assets", path.basename(slide.visual));
-            const rootLibPath = path.join(projectRoot, "src", slide.visual);
-            
-            if (fs.existsSync(sessionPath)) {
-                visualPath = sessionPath;
-            } else if (fs.existsSync(rootStaticPath)) {
-                visualPath = rootStaticPath;
-            } else if (fs.existsSync(rootLibPath)) {
-                visualPath = rootLibPath;
-            }
-
-            if (visualPath && fs.existsSync(visualPath)) {
-                const base64Image = fs.readFileSync(visualPath).toString('base64');
-                await page.evaluate((b64) => {
-                    const img = document.getElementById('visual');
+            let assetPath = path.join(sessionDir, slide.visual);
+            if (fs.existsSync(assetPath)) {
+                const imgData = fs.readFileSync(assetPath).toString('base64');
+                await page.evaluate(({ b64 }) => {
+                    const img = document.getElementById('visual-img');
                     if (img) img.src = `data:image/png;base64,${b64}`;
-                }, base64Image);
+                }, { b64: imgData });
             } else {
                 console.warn(` [!] Warning: Visual not found: ${slide.visual}`);
-                // Fallback UI or Placeholder
                 await page.evaluate(() => {
-                    const visualBox = document.querySelector('.visual-section');
-                    if (visualBox) {
-                        visualBox.style.background = 'linear-gradient(45deg, #1B2A4A, #2E5090)';
-                        visualBox.innerHTML = '<div style="font-size: 32px; color: rgba(255,255,255,0.2); font-weight: 800; text-transform: uppercase; letter-spacing: 5px;">Strategic Vision Asset</div>';
-                    }
+                    const img = document.getElementById('visual-img');
+                    const fb = document.getElementById('visual-fallback');
+                    if (img) img.style.display = 'none';
+                    if (fb) fb.style.display = 'flex';
                 });
             }
         }
