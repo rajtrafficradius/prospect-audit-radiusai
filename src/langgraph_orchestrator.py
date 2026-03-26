@@ -373,7 +373,7 @@ def run_langgraph_pipeline(domain: str, company: str, country: str = "us", custo
         rag_ready=False,
         strategy_narrative={},
         errors=[],
-        job_id=custom_out_dir.split("/")[-1] if custom_out_dir and "sessions" in custom_out_dir else None
+        job_id=job_id or (custom_out_dir.split("/")[-1] if custom_out_dir and "sessions" in custom_out_dir else None)
     )
     
     # If job_id was passed directly as the 5th arg (or 8th in total including python script etc)
