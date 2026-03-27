@@ -22,6 +22,16 @@ async function renderSlides(sessionDir, outputDir) {
         deviceScaleFactor: 2 // Enable High-DPI (Retina) for 4K-ish quality
     });
     const page = await context.newPage();
+    
+    // Add logging for browser errors
+    page.on('console', msg => {
+        if (msg.type() === 'error' || msg.type() === 'warn') {
+            console.log(` [Browser ${msg.type().toUpperCase()}]: ${msg.text()}`);
+        }
+    });
+    page.on('pageerror', err => {
+        console.error(` [Browser Exception]: ${err.message}`);
+    });
 
     const logoPath = path.join(path.dirname(__dirname), 'src', 'static', 'logo.png');
     let logoBase64 = "";
@@ -130,6 +140,18 @@ async function renderSlides(sessionDir, outputDir) {
             }
 
         }, { slide, index: i, totalSlides: slidesData.length, logoB64: logoBase64 });
+
+        // V9: Component Injection (Must happen after setContent and main evaluate)
+        if (slide.archetype && slide.component_html) {
+            await page.evaluate(({ html, slideData }) => {
+                if (typeof window.loadComponent === 'function') {
+                    window.loadComponent(html, slideData);
+                }
+            }, { html: slide.component_html, slideData: slide });
+            
+            // Wait for component to settle and transitions to finish
+            await page.waitForTimeout(1000);
+        }
 
         // Handle Image Path Resolution (relative to sessionDir) for 'image' type visuals
         // This needs to happen AFTER the page.evaluate call sets up the visual type

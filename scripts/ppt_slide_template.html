@@ -70,6 +70,38 @@
             padding-bottom: 25px;
         }
 
+        .main-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 40px;
+            height: 480px;
+        }
+
+        /* V9 Breakout System */
+        body.v9-active #header,
+        body.v9-active #header_section,
+        body.v9-active #text-section {
+            display: none !important;
+        }
+        body.v9-active #content-grid {
+            display: block !important;
+            height: 100% !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        body.v9-active #visual_content {
+            display: block !important;
+            width: 100% !important;
+            height: 100% !important;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 10;
+            background: var(--bg); /* Ensure v9 covers legacy bleed */
+        }
+
         .slide-title {
             font-family: 'Outfit', sans-serif;
             font-weight: 800;
@@ -254,12 +286,9 @@
                 <div class="impact-quote" id="quote"></div>
             </div>
             
-            <div class="visual-section" id="visual-section">
-                <div id="visual_content" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
-                    <!-- V9 COMPONENTS INJECTED HERE -->
-                </div>
-            </div>
         </div>
+        
+        <div id="visual_content"></div>
 
         <!-- FOOTER -->
         <div class="slide-footer">
@@ -277,24 +306,43 @@
             const container = document.getElementById('visual_content');
             container.innerHTML = htmlContent;
             
-            // If v9 is active, let's hide the default header to avoid duplication
-            // Especially for Title and Roadmap slides where the component is the star
-            const header = document.getElementById('header_section');
-            if (header) header.style.display = 'none';
+            // If v9 is active, hide default header and breakout of layout
+            document.body.classList.add('v9-active');
+            ['header', 'header_section', 'bullets_container', 'bullets_container', 'text-section'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
 
-            // Auto-populate based on slide data
-            // We map the full slide object so the component can use #title, #subtitle, etc.
-            if (slideData && typeof slideData === 'object') {
-                Object.keys(slideData).forEach(key => {
-                    const el = container.querySelector(`#${key}`);
-                    if (el) el.innerHTML = slideData[key];
-                });
+            if (!slideData) return;
 
-                // Also handle visual_data if it's a dict
-                if (slideData.visual_data && typeof slideData.visual_data === 'object' && !Array.isArray(slideData.visual_data)) {
-                    Object.keys(slideData.visual_data).forEach(key => {
+            // 1. Map top-level slide properties (title, subtitle, etc)
+            Object.keys(slideData).forEach(key => {
+                const el = container.querySelector(`#${key}`);
+                if (el && typeof slideData[key] === 'string') el.innerHTML = slideData[key];
+            });
+
+            // 2. Map visual_data
+            const vd = slideData.visual_data;
+            if (vd) {
+                if (Array.isArray(vd)) {
+                    // Handle list data (common for metrics/charts)
+                    vd.forEach((val, idx) => {
+                        const id = idx + 1;
+                        const valEl = container.querySelector(`#val${id}`);
+                        if (valEl) valEl.innerHTML = val;
+                        
+                        // Smart Labels for audit metrics if not provided
+                        const lblEl = container.querySelector(`#lbl${id}`);
+                        if (lblEl && (lblEl.innerHTML === 'Label' || lblEl.innerHTML === '0 LABEL')) {
+                            const labels = ['SEO Score', 'GEO Visibility', 'AEO Answer Rate', 'Trust Flow', 'Authority'];
+                            lblEl.innerHTML = labels[idx] || `Metric ${id}`;
+                        }
+                    });
+                } else if (typeof vd === 'object') {
+                    // Handle dictionary data
+                    Object.keys(vd).forEach(key => {
                         const el = container.querySelector(`#${key}`);
-                        if (el) el.innerHTML = slideData.visual_data[key];
+                        if (el) el.innerHTML = vd[key];
                     });
                 }
             }
