@@ -94,7 +94,7 @@
         body.v9-active #visual_content {
             display: flex !important;
             flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: center;
             width: 100% !important;
             height: 100% !important;
@@ -103,8 +103,37 @@
             left: 0;
             z-index: 10;
             background: var(--navy);
-            padding: 80px 100px;
-            gap: 40px;
+            background-image: 
+                linear-gradient(rgba(0, 204, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 204, 255, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+            padding: 100px;
+            gap: 20px;
+            overflow: hidden;
+        }
+
+        /* Restore v9 Minimalist Header */
+        body.v9-active .v9-header {
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            right: 60px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 204, 255, 0.2);
+        }
+
+        .v9-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 42px;
+            font-weight: 800;
+            color: #FFF;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 0 20px rgba(0, 204, 255, 0.3);
         }
 
         /* Hybrid Narrative Box */
@@ -348,8 +377,14 @@
         </div>
         
         <div id="visual_content">
-            <!-- V9 Component Injected Here -->
-            <div id="v9-component-target" style="width: 100%;"></div>
+            <!-- Glassmorphic Header for V9 -->
+            <div class="v9-header">
+                <div id="v9-top-title" class="v9-title">STRATEGIC INSIGHT</div>
+                <div style="color: var(--accent); font-weight: 800; font-size: 18px; letter-spacing: 5px;">V9.1 HYBRID PIPELINE</div>
+            </div>
+
+            <!-- V9 Component Injected Here - Centered Container -->
+            <div id="v9-component-target" style="flex: 1; display: flex; align-items: center; justify-content: center; width: 100%;"></div>
 
             <!-- Narrative Box for Strategy Text -->
             <div id="narrative-box" class="narrative-box" style="display: none;">
@@ -381,12 +416,18 @@
                 if (el) el.style.display = 'none';
             });
 
+            // v9 Polish: Hide v9 header on title slides
+            const v9Header = document.querySelector('.v9-header');
+            if (v9Header) {
+                v9Header.style.display = (slideData.archetype === 'title_v9') ? 'none' : 'flex';
+            }
+
             if (!slideData) return;
 
             // 1. Map top-level slide properties (title, subtitle, etc)
             const mappings = {
-                'title': ['title', 'top_title'],
-                'subtitle': ['subtitle', 'top_subtitle']
+                'title': ['title', 'top_title', 'v9-top-title'],
+                'subtitle': ['subtitle', 'top_subtitle', 'v9-subtitle']
             };
 
             Object.keys(mappings).forEach(key => {

@@ -1,41 +1,72 @@
-<div class="aeo-flow">
-    <div class="entity-node" style="top:50%; left:50%;">Sun City Air</div>
-    <div class="query-line q1">"Best AC Brisbane"</div>
-    <div class="query-line q2">"Air con repair"</div>
-    <div class="query-line q3">"HVAC Brisbane"</div>
-    <div class="ai-brain-glow"></div>
+<div class="aeo-visual">
+    <div class="scanline"></div>
+    <div class="node-container">
+        <div class="node active" id="node1">AI MODELS</div>
+        <div class="connector pulse"></div>
+        <div class="node active" id="node2">CONTEXT</div>
+        <div class="connector pulse"></div>
+        <div class="node active" id="node3">ANSWERS</div>
+    </div>
 </div>
 
 <style>
-.aeo-flow {
-    width: 600px;
-    height: 600px;
+.aeo-visual {
+    width: 800px;
+    height: 400px;
+    background: rgba(0, 204, 255, 0.02);
+    border: 1px solid rgba(0, 204, 255, 0.1);
+    border-radius: 20px;
     position: relative;
+    overflow: hidden;
     display: flex;
-    align-items: center; justify-content: center;
+    align-items: center;
+    justify-content: center;
 }
-.entity-node {
-    padding: 30px 50px;
-    background: rgba(0, 204, 255, 0.2);
-    border: 2px solid var(--accent);
-    border-radius: 60px;
-    font-size: 32px;
-    font-weight: 800;
-    z-index: 10;
-    box-shadow: 0 0 50px rgba(0, 204, 255, 0.4);
-}
-.query-line {
+.scanline {
     position: absolute;
-    font-size: 18px;
-    color: var(--accent);
-    white-space: nowrap;
-    opacity: 0.6;
+    top: 0; left: -100%;
+    width: 200px; height: 100%;
+    background: linear-gradient(to right, transparent, rgba(0, 204, 255, 0.1), transparent);
+    animation: scanSide 4s linear infinite;
 }
-.q1 { top: 20%; left: 10%; transform: translate(50%, -50%); }
-.q2 { top: 80%; left: 60%; transform: translate(-50%, -50%); }
-.q3 { top: 20%; left: 70%; transform: translate(-50%, -50%); }
-.ai-brain-glow {
-    position: absolute; width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+@keyframes scanSide {
+    from { left: -200px; }
+    to { left: 800px; }
+}
+.node-container {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    z-index: 5;
+}
+.node {
+    padding: 20px 40px;
+    background: var(--glass);
+    border: 1px solid var(--accent);
+    color: #FFF;
+    font-weight: 800;
+    border-radius: 12px;
+    box-shadow: 0 0 30px rgba(0, 204, 255, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+.connector {
+    width: 60px; height: 2px;
+    background: var(--accent);
+    position: relative;
+}
+.connector.pulse::after {
+    content: '';
+    position: absolute;
+    top: -4px; left: 0;
+    width: 10px; height: 10px;
+    background: #FFF;
+    border-radius: 50%;
+    box-shadow: 0 0 15px #FFF;
+    animation: flow 1.5s infinite linear;
+}
+@keyframes flow {
+    from { left: 0; }
+    to { left: 100%; }
 }
 </style>
