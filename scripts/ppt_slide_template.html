@@ -7,14 +7,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --navy: #1B2A4A;
-            --blue: #2E5090;
+            --navy: #0F172A; /* Deeper Navy for Premium Feel */
+            --blue: #1E293B;
             --accent: #00CCFF;
-            --gold: #D4AF37;
-            --white: #FFFFFF;
-            --glass: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-blur: blur(12px);
+            --gold: #FACC15;
+            --white: #F8FAFC;
+            --glass: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-blur: blur(20px);
         }
 
         * {
@@ -40,14 +40,16 @@
         /* Ambient Background Gradients */
         .ambient-glow {
             position: absolute;
-            width: 1000px;
-            height: 1000px;
-            background: radial-gradient(circle, rgba(46, 80, 144, 0.35) 0%, rgba(27, 42, 74, 0) 75%);
+            width: 1200px;
+            height: 1200px;
+            background: radial-gradient(circle, rgba(0, 204, 255, 0.15) 0%, rgba(27, 42, 74, 0) 70%);
             z-index: 0;
             pointer-events: none;
+            filter: blur(100px);
         }
-        .glow-tr { top: -300px; right: -300px; }
-        .glow-bl { bottom: -300px; left: -300px; }
+        .glow-tr { top: -400px; right: -400px; background: radial-gradient(circle, rgba(0, 204, 255, 0.2) 0%, rgba(27, 42, 74, 0) 70%); }
+        .glow-bl { bottom: -400px; left: -400px; background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, rgba(27, 42, 74, 0) 70%); }
+        .glow-center { top: 50%; left: 50%; transform: translate(-50%, -50%); width: 1500px; height: 1500px; background: radial-gradient(circle, rgba(46, 80, 144, 0.1) 0%, rgba(27, 42, 74, 0) 80%); }
 
         .slide-container {
             width: 1720px;
@@ -126,19 +128,19 @@
         .text-section { display: flex; flex-direction: column; justify-content: flex-start; gap: 35px; max-height: 800px; overflow: hidden; }
         
         .visual-section {
-            background: var(--glass);
+            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
             border: 1px solid var(--glass-border);
             backdrop-filter: var(--glass-blur);
             border-radius: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px;
+            padding: 50px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
-            max-height: 750px;
-            min-height: 600px;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+            max-height: 800px;
+            min-height: 650px;
         }
 
         .visual-placeholder {

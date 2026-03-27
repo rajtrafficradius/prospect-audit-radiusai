@@ -292,3 +292,19 @@ INFO:     Finished server process [20672]
 INFO:     Started server process [20711]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'scripts/synthesize_ppt_json.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [20711]
+INFO:     Started server process [21856]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'scripts/synthesize_ppt_json.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [21856]
+INFO:     Started server process [33034]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.

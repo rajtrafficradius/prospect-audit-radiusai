@@ -52,11 +52,15 @@ def synthesize_ppt_json(session_dir, company_name):
     Your task is to synthesize the definitive 15-Slide MASTER PRESENTATION for {company_name}.
     
     TONAL & CONTENT RULES (CRITICAL):
-    1. AGENCY-GRADE DETAIL: Each slide must be dense with strategic insight. 
+    1. EXCLUSIVELY ORGANIC: This is a 100% Organic Strategy based on SEO, AEO, and GEO.
+       - **STRICTLY EXCLUDE** all mention of Google Ads, PPC, Paid Social, or Search Engine Marketing (SEM).
+       - Ensure all strategic points focus on building authority, visibility, and user trust through organic channels.
+    2. AGENCY-GRADE DETAIL: Each slide must be dense with strategic insight. 
        - 'bullets': Generate 5-7 HIGHLY DETAILED, long-form bullet points (25+ words each).
        - 'subtitle': Generate a powerful, 2-sentence executive summary for the slide header.
-    2. NO NUMERIC TIMELINES: ALWAYS use 'Phase 1: Activation', 'Phase 2: Acceleration', 'Phase 3: Authority'.
-    3. NO PROJECTED REVENUE: NEVER give specific '$' projections. Use qualitative competitive impact.
+    3. DATA-GROUNDED: Use the provided Strategy Narrative and Audit Findings to drive the content.
+    4. NO NUMERIC TIMELINES: ALWAYS use 'Phase 1: Activation', 'Phase 2: Acceleration', 'Phase 3: Authority'.
+    5. NO PROJECTED REVENUE: NEVER give specific '$' projections. Use qualitative competitive impact.
 
     MANDATORY VISUALS (CSS DIAGRAMS):
     You MUST provide 'visual_type' and 'visual_data' for every slide (except 'title' layout):
@@ -70,12 +74,13 @@ def synthesize_ppt_json(session_dir, company_name):
     - Slide 1: **COVER SLIDE** (Layout: 'title').
     - Slide 2: **EXECUTIVE SUMMARY** (Layout: 'bullets', visual_type: 'radar').
     - Slide 3: **STRATEGIC ROADMAP** (Layout: 'bullets', visual_type: 'pyramid').
-    - Slides 4-14: Strategic Deep-Dives. Mix 'funnel', 'matrix', 'radar'. Use 'image' (homepage_screenshot.png) for CRO.
+    - Slides 4-14: Strategic Deep-Dives (SEO Foundation, Entity Building, AEO Optimization, Local SEO, Content Authority, GEO Presence, etc.). Mix 'funnel', 'matrix', 'radar'. Use 'image' (homepage_screenshot.png) for CRO.
     - Slide 15: **PARTNERSHIP & NEXT STEPS** (Layout: 'bullets').
     
     --- DATA CONTEXT ---
     BUSINESS: {json.dumps(ba, indent=2)[:3000]}
     STRATEGY: {json.dumps(na, indent=2)[:4000]}
+    AUDIT: {json.dumps(au, indent=2)[:3000]}
     
     GENERATE ALL 15 SLIDES. ENSURE VISUAL DIVERSITY VIA CSS DIAGRAMS. NO EMPTY SLIDES.
     """
