@@ -35,6 +35,16 @@ async function renderSlides(sessionDir, outputDir) {
         const slide = slidesData[i];
         const slideNum = (i + 1).toString().padStart(2, '0');
         
+        // V9: Load Component HTML if archetype is present
+        if (slide.archetype) {
+            const componentPath = path.join(__dirname, 'components', `${slide.archetype}.html`);
+            if (fs.existsSync(componentPath)) {
+                slide.component_html = fs.readFileSync(componentPath, 'utf8');
+            } else {
+                console.warn(` [!] Archetype component not found: ${slide.archetype}`);
+            }
+        }
+
         await page.setContent(templateHtml);
 
         // Inject data via DOM manipulation
@@ -110,17 +120,20 @@ async function renderSlides(sessionDir, outputDir) {
                 }
             }
 
-            // VISUAL / DIAGRAM INJECTION
-            if (typeof window.renderDiagram === 'function') {
+            // V9 COMPONENT INJECTION
+            if (slide.archetype && typeof window.loadComponent === 'function') {
+                // The actual HTML content will be passed from the Node side
+                // slide.component_html is injected by the loop below
+                if (slide.component_html) {
+                    window.loadComponent(slide.component_html, slide.visual_data);
+                }
+            } else if (typeof window.renderDiagram === 'function') {
+                // LEGACY V8 SUPPORT
                 if (slide.visual_type && slide.visual_data) {
                     window.renderDiagram(slide.visual_type, slide.visual_data);
                 } else if (slide.visual) {
                     window.renderDiagram('image', slide.visual);
-                } else {
-                    window.renderDiagram('none');
                 }
-            } else {
-                if (visualSection) visualSection.style.display = 'none';
             }
 
         }, { slide, index: i, totalSlides: slidesData.length, logoB64: logoBase64 });

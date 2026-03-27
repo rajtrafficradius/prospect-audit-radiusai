@@ -1,0 +1,41 @@
+<div class="aeo-flow">
+    <div class="entity-node" style="top:50%; left:50%;">Sun City Air</div>
+    <div class="query-line q1">"Best AC Brisbane"</div>
+    <div class="query-line q2">"Air con repair"</div>
+    <div class="query-line q3">"HVAC Brisbane"</div>
+    <div class="ai-brain-glow"></div>
+</div>
+
+<style>
+.aeo-flow {
+    width: 600px;
+    height: 600px;
+    position: relative;
+    display: flex;
+    align-items: center; justify-content: center;
+}
+.entity-node {
+    padding: 30px 50px;
+    background: rgba(0, 204, 255, 0.2);
+    border: 2px solid var(--accent);
+    border-radius: 60px;
+    font-size: 32px;
+    font-weight: 800;
+    z-index: 10;
+    box-shadow: 0 0 50px rgba(0, 204, 255, 0.4);
+}
+.query-line {
+    position: absolute;
+    font-size: 18px;
+    color: var(--accent);
+    white-space: nowrap;
+    opacity: 0.6;
+}
+.q1 { top: 20%; left: 10%; transform: translate(50%, -50%); }
+.q2 { top: 80%; left: 60%; transform: translate(-50%, -50%); }
+.q3 { top: 20%; left: 70%; transform: translate(-50%, -50%); }
+.ai-brain-glow {
+    position: absolute; width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+}
+</style>

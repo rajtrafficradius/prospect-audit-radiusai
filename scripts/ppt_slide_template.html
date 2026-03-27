@@ -225,11 +225,11 @@
     <div class="ambient-glow glow-bl"></div>
 
     <div class="slide-container" id="slide">
-        <!-- HEADER (Hidden in Title Layout) -->
+        <!-- HEADER -->
         <div class="slide-header" id="header">
             <div style="max-width: 1200px;">
-                <p class="slide-subtitle" id="subtitle">MARKET INTELLIGENCE & GAP ANALYSIS</p>
-                <h1 class="slide-title" id="title">Competitive Dominance</h1>
+                <p class="slide-subtitle" id="subtitle">STRATEGIC ANALYSIS</p>
+                <h1 class="slide-title" id="title">Slide Title</h1>
             </div>
             <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
                 <img id="logo-img" src="" style="height: 70px; display: none; margin-bottom: 10px;">
@@ -242,7 +242,7 @@
 
         <!-- CONTENT -->
         <div class="content-grid" id="content-grid">
-            <!-- Center Content for Title Layout -->
+            <!-- Center Content (Title Mode) -->
             <div id="title-layout-center" style="display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding-bottom: 50px;">
                 <h1 class="big-title-h1" id="big-title">PHASE 1: ACTIVATION</h1>
                 <p class="big-subtitle-p" id="big-subtitle">Establishing The Authority Foundation</p>
@@ -250,51 +250,13 @@
 
             <!-- Standard Sections -->
             <div class="text-section" id="text-section">
-                <ul class="bullet-list" id="bullets">
-                    <!-- Bullets injected here -->
-                </ul>
-                <div class="impact-quote" id="quote">
-                    <!-- Quote injected here -->
-                </div>
+                <ul class="bullet-list" id="bullets"></ul>
+                <div class="impact-quote" id="quote"></div>
             </div>
+            
             <div class="visual-section" id="visual-section">
-                <div id="visual-container" class="diagram-container">
-                    <!-- 1. IMAGE (Legacy fallback) -->
-                    <img src="" class="visual-placeholder" id="visual-img" style="display:none;">
-
-                    <!-- 2. PYRAMID -->
-                    <div id="diag-pyramid" class="pyramid" style="display:none;">
-                        <div class="pyramid-tier tier-1">GEO Authority</div>
-                        <div class="pyramid-tier tier-2">AEO Optimization</div>
-                        <div class="pyramid-tier tier-3">SEO Foundations</div>
-                    </div>
-
-                    <!-- 3. FUNNEL -->
-                    <div id="diag-funnel" class="funnel" style="display:none;">
-                        <div class="funnel-step step-1">Awareness</div>
-                        <div class="funnel-step step-2">Consideration</div>
-                        <div class="funnel-step step-3">Intention</div>
-                        <div class="funnel-step step-4">Conversion</div>
-                    </div>
-
-                    <!-- 4. MATRIX -->
-                    <div id="diag-matrix" class="matrix" style="display:none;">
-                        <div class="matrix-axis-y">Market Share</div>
-                        <div class="matrix-quad">Traditionalist</div>
-                        <div class="matrix-quad quad-active">Modern Leader</div>
-                        <div class="matrix-quad">Underdog</div>
-                        <div class="matrix-quad">Niche Expert</div>
-                        <div class="matrix-axis-x">AI Readiness</div>
-                    </div>
-
-                    <!-- 5. RADAR (SVG) -->
-                    <div id="diag-radar" style="display:none; width: 600px; height: 600px;">
-                        <svg id="radar-svg" viewBox="0 0 400 400" style="width:100%; height:100%;"></svg>
-                    </div>
-
-                    <div id="visual-fallback" style="display: none; width: 70%; height: 70%; border: 2px dashed rgba(255,255,255,0.1); border-radius: 20px; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
-                         <p style="font-size: 32px; color: rgba(255,255,255,0.2); font-weight: 800; text-transform: uppercase;">Strategic Insight Asset</p>
-                    </div>
+                <div id="visual_content" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                    <!-- V9 COMPONENTS INJECTED HERE -->
                 </div>
             </div>
         </div>
@@ -310,114 +272,24 @@
     </div>
 
     <script>
-        function drawRadar(scores) {
-            const svg = document.getElementById('radar-svg');
-            const size = 400;
-            const center = size / 2;
-            const radius = 150;
-            const labels = ["SEO", "AEO", "GEO", "UI/UX", "Trust"];
-            const points = [];
+        // V9 COMPONENT ROUTER
+        window.loadComponent = function(htmlContent, data) {
+            const container = document.getElementById('visual_content');
+            container.innerHTML = htmlContent;
             
-            svg.innerHTML = '';
-            
-            // Draw background polygons
-            for (let i = 1; i <= 5; i++) {
-                const r = (radius / 5) * i;
-                let poly = `<polygon points="`;
-                for (let j = 0; j < 5; j++) {
-                    const angle = (Math.PI * 2 * j) / 5 - Math.PI / 2;
-                    poly += `${center + r * Math.cos(angle)},${center + r * Math.sin(angle)} `;
-                }
-                poly += `" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>`;
-                svg.innerHTML += poly;
+            // Auto-populate IDs if data is provided and is a dictionary
+            if (data && typeof data === 'object' && !Array.isArray(data)) {
+                Object.keys(data).forEach(key => {
+                    const el = container.querySelector(`#${key}`);
+                    if (el) el.innerHTML = data[key];
+                });
             }
+        };
 
-            // Draw data polygon
-            let dataPoints = "";
-            for (let j = 0; j < 5; j++) {
-                const angle = (Math.PI * 2 * j) / 5 - Math.PI / 2;
-                const score = (scores[j] || 50) / 100;
-                const x = center + radius * score * Math.cos(angle);
-                const y = center + radius * score * Math.sin(angle);
-                dataPoints += `${x},${y} `;
-                
-                // Labels
-                const lx = center + (radius + 30) * Math.cos(angle);
-                const ly = center + (radius + 20) * Math.sin(angle);
-                svg.innerHTML += `<text x="${lx}" y="${ly}" fill="var(--accent)" font-size="14" text-anchor="middle" font-family="Outfit">${labels[j]}</text>`;
-            }
-            svg.innerHTML += `<polygon points="${dataPoints}" fill="rgba(0, 204, 255, 0.4)" stroke="var(--accent)" stroke-width="3"/>`;
-        }
-
+        // Legacy Support for Radar (V8 compatibility)
         window.renderDiagram = function(type, data) {
-            const diags = ['diag-pyramid', 'diag-funnel', 'diag-matrix', 'diag-radar', 'visual-img'];
-            diags.forEach(d => {
-                const el = document.getElementById(d);
-                if (el) el.style.display = 'none';
-            });
-
-            const visualSection = document.getElementById('visual-section');
-            if (visualSection) visualSection.style.display = 'flex';
-            
-            if (type === 'pyramid') {
-                const el = document.getElementById('diag-pyramid');
-                if (el) {
-                    el.style.display = 'flex';
-                    const tiers = el.querySelectorAll('.pyramid-tier');
-                    if (data && data.length >= 3) {
-                        tiers[0].innerText = data[0];
-                        tiers[1].innerText = data[1];
-                        tiers[2].innerText = data[2];
-                    }
-                }
-            } else if (type === 'funnel') {
-                const el = document.getElementById('diag-funnel');
-                if (el) {
-                    el.style.display = 'flex';
-                    const steps = el.querySelectorAll('.funnel-step');
-                    if (data && data.length >= 4) {
-                        steps[0].innerText = data[0];
-                        steps[1].innerText = data[1];
-                        steps[2].innerText = data[2];
-                        steps[3].innerText = data[3];
-                    }
-                }
-            } else if (type === 'matrix') {
-                const el = document.getElementById('diag-matrix');
-                if (el) {
-                    el.style.display = 'grid';
-                    const quads = el.querySelectorAll('.matrix-quad');
-                    quads.forEach(q => q.classList.remove('quad-active'));
-                    
-                    if (data && data.length >= 4) {
-                        quads[0].innerText = data[0];
-                        quads[1].innerText = data[1];
-                        quads[2].innerText = data[2];
-                        quads[3].innerText = data[3];
-                        // If 5th element is provided, it's the active index (0-3)
-                        if (data[4] !== undefined) {
-                            const idx = parseInt(data[4]);
-                            if (quads[idx]) quads[idx].classList.add('quad-active');
-                        } else {
-                            quads[1].classList.add('quad-active'); // Default to Top-Right
-                        }
-                    }
-                }
-            } else if (type === 'radar') {
-                const el = document.getElementById('diag-radar');
-                if (el) el.style.display = 'block';
-                // Convert string segments to numbers
-                const scores = (data || []).map(v => parseInt(v) || 50);
-                drawRadar(scores.length >= 5 ? scores : [80, 60, 70, 90, 85]);
-            } else if (type === 'image') {
-                const img = document.getElementById('visual-img');
-                if (img) {
-                    img.style.display = 'block';
-                    img.src = data[0] || data; // Handle both list and string
-                }
-            } else {
-                if (visualSection) visualSection.style.display = 'none';
-            }
+             // If v9 archetype didn't fire, we can still use legacy logic if needed
+             // But for v9, we should transition to dedicated components
         };
     </script>
 </body>
