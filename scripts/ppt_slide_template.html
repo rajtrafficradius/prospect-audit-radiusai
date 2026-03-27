@@ -496,7 +496,15 @@
                     // Handle dictionary data
                     Object.keys(vd).forEach(key => {
                         const el = container.querySelector(`#${key}`);
-                        if (el) el.innerHTML = vd[key];
+                        if (el) {
+                            if (key.includes('bar') || key.includes('progress')) {
+                                el.style.width = vd[key];
+                            } else if (key.includes('color')) {
+                                el.style.color = vd[key];
+                            } else {
+                                el.innerHTML = vd[key];
+                            }
+                        }
                     });
                 }
             }

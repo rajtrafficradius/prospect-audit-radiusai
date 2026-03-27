@@ -1,7 +1,8 @@
 import os
 import json
 import subprocess
-from typing import TypedDict, List
+import datetime
+from typing import TypedDict, List, Optional, Any, Dict, Union
 from langgraph.graph import StateGraph, START, END
 
 # Import the existing rigid pipeline phases
@@ -222,7 +223,6 @@ def phase_5_strategy_synthesis(state: AuditState):
 def phase_6_deliverables(state: AuditState):
     print("\n--- [Node] Phase 6: Injecting Dynamic Architecture to Deliverables ---")
     print("[PROGRESS] 98% | Assembling Deliverables (DOCX, XLSX)")
-    import datetime
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     script_dir = os.path.join(project_root, "scripts")
     
@@ -331,7 +331,7 @@ workflow.add_edge("deliverables", END)
 # Compile into an executable AI agent
 app = workflow.compile()
 
-def run_langgraph_pipeline(domain: str, company: str, country: str = "us", custom_out_dir: str = None, job_id: str = None):
+def run_langgraph_pipeline(domain: str, company: str, country: str = "us", custom_out_dir: Optional[str] = None, job_id: Optional[str] = None):
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     
     if custom_out_dir:

@@ -340,3 +340,11 @@ INFO:     Finished server process [35937]
 INFO:     Started server process [36283]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'src/langgraph_orchestrator.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [36283]
+INFO:     Started server process [62494]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
