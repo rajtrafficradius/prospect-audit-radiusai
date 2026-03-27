@@ -120,15 +120,8 @@ async function renderSlides(sessionDir, outputDir) {
                 }
             }
 
-            // V9 COMPONENT INJECTION
-            if (slide.archetype && typeof window.loadComponent === 'function') {
-                // The actual HTML content will be passed from the Node side
-                // slide.component_html is injected by the loop below
-                if (slide.component_html) {
-                    window.loadComponent(slide.component_html, slide.visual_data);
-                }
-            } else if (typeof window.renderDiagram === 'function') {
-                // LEGACY V8 SUPPORT
+            // LEGACY V8 SUPPORT (V9 component injection is handled outside this evaluate block)
+            if (typeof window.renderDiagram === 'function') {
                 if (slide.visual_type && slide.visual_data) {
                     window.renderDiagram(slide.visual_type, slide.visual_data);
                 } else if (slide.visual) {
