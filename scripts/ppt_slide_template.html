@@ -79,8 +79,8 @@
         }
 
         /* V9 Breakout System */
-        body.v9-active #header,
         body.v9-active #header_section,
+        body.v9-active #header_content,
         body.v9-active #text-section {
             display: none !important;
         }
@@ -92,14 +92,73 @@
             padding: 0 !important;
         }
         body.v9-active #visual_content {
-            display: block !important;
+            display: flex !important;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
             width: 100% !important;
             height: 100% !important;
             position: absolute;
             top: 0;
             left: 0;
             z-index: 10;
-            background: var(--bg); /* Ensure v9 covers legacy bleed */
+            background: var(--navy);
+            padding: 80px 100px;
+            gap: 40px;
+        }
+
+        /* Hybrid Narrative Box */
+        .narrative-box {
+            width: 100%;
+            background: var(--glass);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: var(--glass-blur);
+            border-radius: 30px;
+            padding: 40px 60px;
+            margin-top: auto; /* Push to bottom */
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: slideUp 0.8s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .narrative-subtitle {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+
+        .narrative-bullets {
+            list-style: none;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 40px;
+        }
+
+        .narrative-item {
+            display: flex;
+            gap: 15px;
+            font-size: 22px;
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.4;
+        }
+
+        .narrative-dot {
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            border-radius: 50%;
+            margin-top: 8px;
+            flex-shrink: 0;
+            box-shadow: 0 0 10px var(--accent);
         }
 
         .slide-title {
@@ -260,8 +319,8 @@
         <!-- HEADER -->
         <div class="slide-header" id="header">
             <div style="max-width: 1200px;">
-                <p class="slide-subtitle" id="subtitle">STRATEGIC ANALYSIS</p>
-                <h1 class="slide-title" id="title">Slide Title</h1>
+                <p class="slide-subtitle" id="header_subtitle">STRATEGIC ANALYSIS</p>
+                <h1 class="slide-title" id="header_title">Slide Title</h1>
             </div>
             <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
                 <img id="logo-img" src="" style="height: 70px; display: none; margin-bottom: 10px;">
@@ -288,7 +347,16 @@
             
         </div>
         
-        <div id="visual_content"></div>
+        <div id="visual_content">
+            <!-- V9 Component Injected Here -->
+            <div id="v9-component-target" style="width: 100%;"></div>
+
+            <!-- Narrative Box for Strategy Text -->
+            <div id="narrative-box" class="narrative-box" style="display: none;">
+                <p id="v9-subtitle" class="narrative-subtitle"></p>
+                <ul id="v9-bullets" class="narrative-bullets"></ul>
+            </div>
+        </div>
 
         <!-- FOOTER -->
         <div class="slide-footer">
@@ -304,7 +372,7 @@
         // V9 COMPONENT ROUTER
         window.loadComponent = function(htmlContent, slideData) {
             const container = document.getElementById('visual_content');
-            container.innerHTML = htmlContent;
+            // Do NOT wipe container.innerHTML here, as it contains our sync targets
             
             // If v9 is active, hide default header and breakout of layout
             document.body.classList.add('v9-active');
@@ -316,12 +384,45 @@
             if (!slideData) return;
 
             // 1. Map top-level slide properties (title, subtitle, etc)
-            Object.keys(slideData).forEach(key => {
-                const el = container.querySelector(`#${key}`);
-                if (el && typeof slideData[key] === 'string') el.innerHTML = slideData[key];
+            const mappings = {
+                'title': ['title', 'top_title'],
+                'subtitle': ['subtitle', 'top_subtitle']
+            };
+
+            Object.keys(mappings).forEach(key => {
+                if (slideData[key]) {
+                    mappings[key].forEach(targetId => {
+                        const el = document.getElementById(targetId);
+                        if (el) el.innerHTML = slideData[key];
+                    });
+                }
             });
 
-            // 2. Map visual_data
+            // 2. Map visual_data to component target
+            const componentTarget = container.querySelector('#v9-component-target');
+            if (componentTarget) {
+                componentTarget.innerHTML = htmlContent;
+            } else {
+                container.innerHTML = htmlContent; // Fallback
+            }
+
+            // 3. Map Narrative Text (Subtitle/Bullets)
+            const narrativeBox = document.getElementById('narrative-box');
+            const v9subtitle = document.getElementById('v9-subtitle');
+            const v9bullets = document.getElementById('v9-bullets');
+
+            if (slideData.subtitle || (slideData.bullets && slideData.bullets.length > 0)) {
+                narrativeBox.style.display = 'flex';
+                if (v9subtitle) v9subtitle.innerHTML = slideData.subtitle || '';
+                
+                if (v9bullets && slideData.bullets) {
+                    v9bullets.innerHTML = slideData.bullets
+                        .map(b => `<li class="narrative-item"><div class="narrative-dot"></div>${b}</li>`)
+                        .join('');
+                }
+            }
+
+            // 4. Map visual_data properties
             const vd = slideData.visual_data;
             if (vd) {
                 if (Array.isArray(vd)) {
