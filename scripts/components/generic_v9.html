@@ -1,115 +1,126 @@
 <div class="generic-v9">
     <div class="feature-grid">
+        <!-- Card 1 -->
         <div class="feature-card glass">
-            <div class="feature-icon">A</div>
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+            </div>
             <div class="feature-title" id="val1">ARCHITECT</div>
             <div class="feature-desc" id="lbl1">Advanced Semantic Structure</div>
+            <div class="feature-progress"><div class="feature-bar" style="width: 82%"></div></div>
         </div>
+
+        <!-- Card 2 -->
         <div class="feature-card glass highlight">
-            <div class="feature-icon">E</div>
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+            </div>
             <div class="feature-title" id="val2">ENGINE</div>
             <div class="feature-desc" id="lbl2">AI-Driven Content Analysis</div>
+            <div class="feature-progress"><div class="feature-bar" style="width: 94%"></div></div>
         </div>
+
+        <!-- Card 3 -->
         <div class="feature-card glass">
-            <div class="feature-icon">O</div>
+            <div class="feature-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m16 12-4-4-4 4"></path><path d="M12 16V8"></path></svg>
+            </div>
             <div class="feature-title" id="val3">OPTIMIZE</div>
             <div class="feature-desc" id="lbl3">Strategic Performance Tuning</div>
+            <div class="feature-progress"><div class="feature-bar" style="width: 88%"></div></div>
         </div>
     </div>
 </div>
 
 <style>
 .generic-v9 {
-    width: 100%;
-    height: 100%;
+    width: 95vw;
+    height: 70vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 100px;
+    padding: 0;
+    position: relative;
 }
+
 .feature-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 40px;
-    width: 85vw;
-    height: 60vh;
-    max-width: 1200px;
+    gap: 60px;
+    width: 100%;
     z-index: 10;
 }
-.generic-visual {
-    width: 900px;
-    height: 500px;
-    background: rgba(0, 204, 255, 0.05);
+
+.feature-card {
+    background: rgba(13, 25, 41, 0.6);
+    backdrop-filter: blur(20px);
     border: 1px solid rgba(0, 204, 255, 0.2);
-    border-radius: 24px;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 0 50px rgba(0, 204, 255, 0.1);
-}
-.grid-overlay {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background-image: radial-gradient(rgba(0, 204, 255, 0.1) 1px, transparent 1px);
-    background-size: 30px 30px;
-    opacity: 0.5;
-}
-.visual-accent-top {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 4px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-}
-.visual-accent-bottom {
-    position: absolute;
-    bottom: 0; left: 0; width: 100%; height: 4px;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-}
-.content-wrapper {
-    z-index: 5;
-    width: 100%;
-    height: 100%;
+    border-radius: 40px;
+    padding: 80px 60px;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
 }
-.feature-card {
-    background: var(--glass);
-    border: 1px solid var(--glass-border);
-    border-radius: 40px;
-    padding: 60px 40px;
-    text-align: center;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
+
 .feature-card:hover {
-    transform: translateY(-20px);
+    transform: translateY(-20px) scale(1.02);
     border-color: var(--accent);
     background: rgba(0, 204, 255, 0.1);
 }
+
 .feature-card.highlight {
     border-color: var(--accent);
-    box-shadow: 0 20px 60px rgba(0, 204, 255, 0.2);
+    box-shadow: 0 30px 80px rgba(0, 204, 255, 0.2);
 }
+
 .feature-icon {
-    font-size: 80px;
-    font-weight: 900;
-    background: linear-gradient(135deg, var(--accent), var(--blue));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 30px;
+    width: 120px;
+    height: 120px;
+    background: linear-gradient(135deg, rgba(0, 204, 255, 0.2), rgba(0, 242, 254, 0.1));
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+    color: var(--accent);
 }
+
+.feature-icon svg {
+    width: 60px;
+    height: 60px;
+}
+
 .feature-title {
-    font-size: 32px;
+    font-size: 38px;
     font-weight: 800;
     color: var(--white);
     letter-spacing: 4px;
-    margin-bottom: 20px;
+    margin-bottom: 25px;
+    text-transform: uppercase;
 }
+
 .feature-desc {
-    font-size: 18px;
+    font-size: 24px;
     color: rgba(255, 255, 255, 0.6);
     line-height: 1.6;
+    margin-bottom: 40px;
+    min-height: 80px;
+}
+
+.feature-progress {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.feature-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #00F2FE);
+    box-shadow: 0 0 15px var(--accent);
 }
 </style>
