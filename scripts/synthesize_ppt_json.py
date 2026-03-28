@@ -16,11 +16,12 @@ from src.archetypes import get_archetype
 class Slide(BaseModel):
     title: str
     subtitle: Optional[str] = ""
-    bullets: List[str] = Field(default_factory=list)
+    bullets: List[str] = Field(default_factory=list, description="Max 4 items, max 15 words each.")
+    takeaway: str = Field(..., description="A bold, 1-sentence strategic takeaway.")
     quote: Optional[str] = ""
-    visual_type: Optional[str] = Field(None, description="One of: 'radar', 'pyramid', 'funnel', 'matrix', 'image'")
+    visual_type: Optional[str] = Field(None, description="One of: 'radar', 'pyramid', 'funnel', 'architecture', 'comparison', 'matrix'")
     visual_data: Optional[List[str]] = Field(default_factory=list, description="Data for the visual. List of strings/values.")
-    layout: str = Field("bullets", description="Layout choice: 'title', 'bullets', 'split', 'chart', 'quote'")
+    layout: str = Field("split", description="Layout choice: 'split', 'title', 'quote'")
     archetype: Optional[str] = None
 
 class PresentationData(BaseModel):
@@ -30,8 +31,6 @@ class PresentationData(BaseModel):
 def synthesize_ppt_json(session_dir, company_name):
     client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
     
-    # Load all audit data
-    # Load all audit data with graceful fallbacks
     def load_json_safe(filename, default=None):
         path = os.path.join(session_dir, filename)
         if os.path.exists(path):
@@ -40,64 +39,46 @@ def synthesize_ppt_json(session_dir, company_name):
         return default if default is not None else {}
 
     ba = load_json_safe("business_analysis.json")
-    mi = load_json_safe("market_intelligence.json")
-    au = load_json_safe("audit_findings.json")
     na = load_json_safe("strategy_narrative.json")
-    
-    if not ba and not na:
-        print(" [!] Critical Data Missing: Cannot synthesize PPT without Business Analysis or Strategy Narrative.")
-        return
+    au = load_json_safe("audit_findings.json")
 
-    # High-fidelity model for structured strategic output
     model_name = "gpt-4o"
     
     prompt = f"""
-    You are an elite Lead Strategist at Traffic Radius. 
-    Your task is to synthesize the definitive 15-Slide MASTER PRESENTATION for {company_name}.
+    You are an elite Growth Architect at Traffic Radius. 
+    Synthesize a 15-Slide EXECUTIVE STRATEGY for {company_name}.
     
     TONAL & CONTENT RULES (CRITICAL):
-    1. EXCLUSIVELY ORGANIC: This is a 100% Organic Strategy based on SEO, AEO, and GEO.
-       - **STRICTLY EXCLUDE** all mention of Google Ads, PPC, Paid Social, or Search Engine Marketing (SEM).
-       - Ensure all strategic points focus on building authority, visibility, and user trust through organic channels.
-    2. AGENCY-GRADE DETAIL: Each slide must be dense with strategic insight. 
-       - 'bullets': Generate 5-7 HIGHLY DETAILED, long-form bullet points (25+ words each).
-       - 'subtitle': Generate a powerful, 2-sentence executive summary for the slide header.
-    3. DATA-GROUNDED: Use the provided Strategy Narrative and Audit Findings to drive the content.
-    4. NO NUMERIC TIMELINES: ALWAYS use 'Phase 1: Activation', 'Phase 2: Acceleration', 'Phase 3: Authority'.
-    5. NO PROJECTED REVENUE: NEVER give specific '$' projections. Use qualitative competitive impact.
+    1. EXECUTIVE BREVITY: This is for a CEO. No paragraphs.
+       - 'bullets': Max 4 points. Max 15 words per point. Use punchy, execution-style language.
+       - 'takeaway': One bold, high-impact sentence that summarizes the "So What?" of the slide.
+    2. NARRATIVE FLOW: 
+       - Cover/Hook → Challenge → Evidence (Audit) → Strategy (SEO/GEO/AEO) → ROI/Outcome.
+    3. EXCLUSIVELY ORGANIC: 100% Organic strategy. Exclude all Paid/Ads/PPC.
 
-    MANDATORY VISUALS (CSS DIAGRAMS):
-    You MUST provide 'visual_type' and 'visual_data' for every slide (except 'title' layout):
-    - 'radar': 'visual_data' = [SEO, AEO, GEO, UI, Trust] (5 integers as strings, 0-100).
-    - 'funnel': 'visual_data' = [Step 1, Step 2, Step 3, Step 4] (4 descriptive labels).
-    - 'pyramid': 'visual_data' = [Top Layer, Middle Layer, Bottom Layer] (3 labels).
-    - 'matrix': 'visual_data' = [Quad 1, Quad 2, Quad 3, Quad 4, ActiveIndex] (4 labels + 1 index '0'-'3').
-    - 'image': 'visual_data' = ['homepage_screenshot.png'] (Use for UI/CRO slides).
-    
-    MANDATORY SLIDE STRUCTURE (STRICT):
-    - Slide 1: **COVER SLIDE** (Layout: 'title').
-    - Slide 2: **EXECUTIVE SUMMARY** (Layout: 'bullets', visual_type: 'radar').
-    - Slide 3: **STRATEGIC ROADMAP** (Layout: 'bullets', visual_type: 'pyramid').
-    - Slides 4-14: Strategic Deep-Dives (SEO Foundation, Entity Building, AEO Optimization, Local SEO, Content Authority, GEO Presence, etc.). Mix 'funnel', 'matrix', 'radar'. Use 'image' (homepage_screenshot.png) for CRO.
-    - Slide 15: **PARTNERSHIP & NEXT STEPS** (Layout: 'bullets').
+    V14 VISUAL FRAMEWORKS:
+    Every slide (except title) MUST have a 'visual_type':
+    - 'funnel': [Awareness, Consideration, Answer, Conversion] (4 labels).
+    - 'architecture': [Foundation, Visibility, Authority] (3 layers).
+    - 'radar': [SEO, AEO, GEO, Trust, Speed] (5 scores 0-100).
+    - 'comparison': [Current State, Target State] (2 descriptive states).
+    - 'matrix': [Low Impact, High Noise, Strategic Core, Growth Lever, 2] (4 quad names + ActiveIndex).
     
     --- DATA CONTEXT ---
-    BUSINESS: {json.dumps(ba, indent=2)[:3000]}
-    STRATEGY: {json.dumps(na, indent=2)[:4000]}
-    AUDIT: {json.dumps(au, indent=2)[:3000]}
-    
-    GENERATE ALL 15 SLIDES. ENSURE VISUAL DIVERSITY VIA CSS DIAGRAMS. NO EMPTY SLIDES.
+    BUSINESS: {json.dumps(ba, indent=2)}
+    STRATEGY: {json.dumps(na, indent=2)}
+    AUDIT: {json.dumps(au, indent=2)}
     """
     
-    print(f"Synthesizing 15-Slide Master Deck via {model_name}...")
+    print(f"Synthesizing v14 Executive Deck via {model_name}...")
     completion = client.beta.chat.completions.parse(
         model=model_name,
         messages=[
-            {"role": "system", "content": "You are a Senior Growth Architect. Your output must be elite, professional, and dense with strategic value."},
+            {"role": "system", "content": "You are a Senior Growth Architect. Output must be punchy, visual, and high-impact. Avoid all long-form text."},
             {"role": "user", "content": prompt}
         ],
         response_format=PresentationData,
-        temperature=0.4
+        temperature=0.3
     )
     
     slides = completion.choices[0].message.parsed.slides

@@ -7,513 +7,228 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --navy: #0F172A; /* Deeper Navy for Premium Feel */
-            --blue: #1E293B;
+            --bg: #080C14;
+            --navy: #0F172A;
             --accent: #00CCFF;
+            --accent-glow: rgba(0, 204, 255, 0.4);
             --gold: #FACC15;
             --white: #F8FAFC;
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-blur: blur(20px);
+            --glass: rgba(15, 23, 42, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --grid: rgba(0, 204, 255, 0.03);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
 
         body {
-            background: var(--navy);
+            background: var(--bg);
             color: var(--white);
             font-family: 'Inter', sans-serif;
             width: 1920px;
             height: 1080px;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             position: relative;
-        }
-
-        /* Ambient Background Gradients */
-        .ambient-glow {
-            position: absolute;
-            width: 1200px;
-            height: 1200px;
-            background: radial-gradient(circle, rgba(0, 204, 255, 0.15) 0%, rgba(27, 42, 74, 0) 70%);
-            z-index: 0;
-            pointer-events: none;
-            filter: blur(100px);
-        }
-        .glow-tr { top: -400px; right: -400px; background: radial-gradient(circle, rgba(0, 204, 255, 0.2) 0%, rgba(27, 42, 74, 0) 70%); }
-        .glow-bl { bottom: -400px; left: -400px; background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, rgba(27, 42, 74, 0) 70%); }
-        .glow-center { top: 50%; left: 50%; transform: translate(-50%, -50%); width: 1500px; height: 1500px; background: radial-gradient(circle, rgba(46, 80, 144, 0.1) 0%, rgba(27, 42, 74, 0) 80%); }
-
-        .slide-container {
-            width: 1720px;
-            height: 900px;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        /* Header Navigation Style */
-        .slide-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 50px;
-            border-bottom: 2px solid var(--glass-border);
-            padding-bottom: 25px;
-        }
-
-        .main-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 40px;
-            height: 480px;
-        }
-
-        /* V9 Breakout System */
-        body.v9-active #header_section,
-        body.v9-active #header_content,
-        body.v9-active #text-section {
-            display: none !important;
-        }
-        body.v9-active #content-grid {
-            display: block !important;
-            height: 100% !important;
-            width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-        body.v9-active #visual_content {
-            display: flex !important;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100% !important;
-            height: 100% !important;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 10;
-            background: var(--navy);
+            /* Coordinate Grid Background */
             background-image: 
-                linear-gradient(rgba(0, 204, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 204, 255, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-            padding: 0; /* Remove padding for true centering */
+                radial-gradient(circle at 2px 2px, var(--grid) 1px, transparent 0);
+            background-size: 40px 40px;
+        }
+
+        /* V14 Layout Structure */
+        .v14-container {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-rows: 160px 1fr 100px;
+            padding: 0;
+        }
+
+        /* Global Header (Span Full) */
+        .v14-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 40px 80px;
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 100;
+        }
+
+        .v14-title-group { display: flex; flex-direction: column; }
+        .v14-subtitle { font-family: 'Outfit'; font-size: 24px; color: var(--accent); letter-spacing: 4px; text-transform: uppercase; font-weight: 600; }
+        .v14-title { font-family: 'Outfit'; font-size: 72px; font-weight: 800; letter-spacing: -2px; text-transform: uppercase; line-height: 1.1; }
+
+        /* Full Width Visual Area */
+        .v14-visual-area {
+            position: relative;
+            padding: 40px 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             overflow: hidden;
         }
 
-        #v9-component-target {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 100%;
-            /* Removed padding-top to keep component perfectly centered */
-        }
-
-        /* Restore v9 Minimalist Header */
-        body.v9-active .v9-header {
+        /* Strategic Takeaway Bar - Centered at Bottom */
+        .v14-takeaway {
             position: absolute;
-            top: 40px;
-            left: 60px;
-            right: 60px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 100;
-            padding-bottom: 20px;
-            border-bottom: 1px solid rgba(0, 204, 255, 0.2);
-        }
-
-        .v9-title {
-            font-family: 'Outfit', sans-serif;
-            font-size: 42px;
-            font-weight: 800;
-            color: #FFF;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            text-shadow: 0 0 20px rgba(0, 204, 255, 0.3);
-        }
-
-        /* Hybrid Narrative Box - Absolute Overlay */
-        .narrative-box {
-            position: absolute;
-            bottom: 60px;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
-            width: 85%;
-            background: var(--glass);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: var(--glass-blur);
-            border-radius: 30px;
-            padding: 30px 50px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            width: 80%;
+            max-width: 1200px;
+            padding: 25px 40px;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid var(--accent);
+            border-radius: 20px;
+            backdrop-filter: blur(20px);
             z-index: 150;
-            animation: slideUp 0.8s ease-out;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .narrative-subtitle {
-            font-family: 'Outfit', sans-serif;
-            font-size: 28px;
-            color: var(--accent);
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            font-weight: 700;
-        }
-
-        .narrative-bullets {
-            list-style: none;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px 40px;
-        }
-
-        .narrative-item {
-            display: flex;
-            gap: 15px;
-            font-size: 22px;
-            color: rgba(255, 255, 255, 0.85);
-            line-height: 1.4;
-        }
-
-        .narrative-dot {
-            width: 12px;
-            height: 12px;
-            background: var(--accent);
-            border-radius: 50%;
-            margin-top: 8px;
-            flex-shrink: 0;
-            box-shadow: 0 0 10px var(--accent);
-        }
-
-        .slide-title {
-            font-family: 'Outfit', sans-serif;
-            font-weight: 800;
-            font-size: 72px;
-            letter-spacing: -1.5px;
-            text-transform: uppercase;
-            background: linear-gradient(135deg, #FFF 0%, #AAA 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .slide-subtitle {
-            font-size: 26px;
-            color: var(--accent);
-            font-weight: 400;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        /* Content Grid System */
-        .content-grid {
-            display: grid;
-            gap: 50px;
-            flex-grow: 1;
-            transition: all 0.5s ease;
-            padding-bottom: 110px; /* Safer buffer for Confidential Footer */
-        }
-
-        /* LAYOUT VARIATIONS */
-        .layout-bullets .content-grid { grid-template-columns: 1fr; }
-        .layout-bullets .visual-section { display: none; }
-
-        .layout-split .content-grid { grid-template-columns: 1fr 1fr; }
-
-        .layout-chart .content-grid { grid-template-columns: 0.8fr 1.2fr; }
-
-        .layout-title .content-grid { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            text-align: center;
-            height: 100%;
-        }
-        .layout-title .slide-header, .layout-title .visual-section, .layout-title .bullet-list { display: none; }
-        .layout-title .big-title-h1 { font-size: 140px; font-weight: 800; font-family: 'Outfit'; color: var(--white); text-transform: uppercase; line-height: 1; margin-bottom: 20px; }
-        .layout-title .big-subtitle-p { font-size: 42px; color: var(--accent); letter-spacing: 5px; text-transform: uppercase; }
-
-        .layout-quote .content-grid { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        .layout-quote .visual-section, .layout-quote .bullet-list { display: none; }
-        .layout-quote .impact-quote { font-size: 82px; border: none; padding: 0; margin: 0; max-width: 1400px; line-height: 1.1; }
-
-        /* Component Styles */
-        .text-section { display: flex; flex-direction: column; justify-content: flex-start; gap: 35px; max-height: 800px; overflow: hidden; }
-        
-        .visual-section {
-            background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.01) 100%);
-            border: 1px solid var(--glass-border);
-            backdrop-filter: var(--glass-blur);
-            border-radius: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
             display: flex;
             align-items: center;
-            justify-content: center;
-            padding: 50px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.4);
-            max-height: 800px;
-            min-height: 650px;
+            gap: 30px;
         }
-
-        .visual-placeholder {
-            width: 100%;
-            height: 100%;
-            max-height: 670px;
-            object-fit: contain;
-            border-radius: 20px;
-            transition: transform 0.3s ease;
+        .v14-takeaway-label { 
+            font-size: 14px; 
+            color: var(--accent); 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            white-space: nowrap;
+            padding-right: 30px;
+            border-right: 1px solid var(--glass-border);
         }
+        .v14-takeaway-text { font-size: 24px; font-weight: 600; color: #FFF; line-height: 1.4; font-style: italic; text-align: left; flex: 1; }
 
-        /* ENGINEERED CSS DIAGRAMS */
-        .diagram-container { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; position: relative; }
-
-        /* 1. Authority Pyramid */
-        .pyramid { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 80%; }
-        .pyramid-tier { 
-            width: var(--w); height: 120px; background: var(--glass); border: 2px solid var(--accent);
-            clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
-            display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 28px;
-            color: var(--white); text-transform: uppercase; letter-spacing: 2px;
-            box-shadow: 0 10px 30px rgba(0, 204, 255, 0.2);
-        }
-        .tier-1 { --w: 40%; background: rgba(0, 204, 255, 0.3); clip-path: polygon(50% 0%, 100% 100%, 0% 100%); height: 140px; }
-        .tier-2 { --w: 70%; background: rgba(0, 204, 255, 0.2); }
-        .tier-3 { --w: 100%; background: rgba(0, 204, 255, 0.1); }
-
-        /* 2. Growth Funnel */
-        .funnel { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 70%; }
-        .funnel-step {
-            width: var(--w); height: 100px; background: linear-gradient(90deg, var(--blue), var(--accent));
-            clip-path: polygon(0% 0%, 100% 0%, 85% 100%, 15% 100%);
-            display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 24px;
-        }
-        .step-1 { --w: 100%; opacity: 1; }
-        .step-2 { --w: 80%; opacity: 0.8; }
-        .step-3 { --w: 60%; opacity: 0.6; }
-        .step-4 { --w: 40%; opacity: 0.4; clip-path: polygon(0% 0%, 100% 0%, 50% 100%, 50% 100%); }
-
-        /* 3. Competitive Matrix */
-        .matrix { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 15px; width: 90%; height: 90%; position: relative; }
-        .matrix-quad { background: var(--glass); border: 1px solid var(--glass-border); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: rgba(255,255,255,0.5); font-weight: 500; text-transform: uppercase; }
-        .quad-active { background: rgba(0, 204, 255, 0.15); border: 2px solid var(--accent); color: var(--white); transform: scale(1.05); box-shadow: 0 0 40px rgba(0, 204, 255, 0.3); }
-        .matrix-axis-x { position: absolute; bottom: -40px; width: 100%; text-align: center; color: var(--accent); font-weight: 700; letter-spacing: 2px; }
-        .matrix-axis-y { position: absolute; left: -60px; height: 100%; display: flex; align-items: center; writing-mode: vertical-rl; transform: rotate(180deg); color: var(--accent); font-weight: 700; letter-spacing: 2px; }
-
-        .bullet-list { 
-            list-style: none; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 25px; 
-            max-height: 700px;
-            overflow-y: hidden; 
-        }
-        .bullet-item { display: flex; gap: 20px; align-items: flex-start; font-size: 30px; line-height: 1.35; color: rgba(255, 255, 255, 0.9); }
-        .bullet-icon {
-            width: 40px; height: 40px; background: linear-gradient(135deg, var(--accent), var(--blue));
-            border-radius: 12px; flex-shrink: 0; margin-top: 5px; display: flex;
-            align-items: center; justify-content: center; box-shadow: 0 0 20px rgba(0, 204, 255, 0.4);
-        }
-
-        .impact-quote {
-            font-family: 'Outfit', sans-serif; font-size: 48px; font-weight: 300; border-left: 8px solid var(--gold);
-            padding-left: 40px; margin-top: 10px; color: #EEE; transition: all 0.3s ease;
-        }
-        .impact-quote strong { color: var(--gold); font-weight: 700; }
-
-        /* Footer Info */
-        .slide-footer {
-            position: absolute; bottom: -80px; width: 100%; display: flex;
-            justify-content: space-between; font-size: 20px; color: rgba(255, 255, 255, 0.4);
+        /* Global Footer */
+        .v14-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 80px;
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.4);
             letter-spacing: 2px;
+            border-top: 1px solid var(--glass-border);
         }
 
-        /* Hide elements if empty */
-        .empty { display: none !important; }
+        /* Decorative Corner Markers */
+        .corner-marker {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--accent);
+            opacity: 0.3;
+            z-index: 100;
+        }
+        .cm-tl { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+        .cm-tr { top: 20px; right: 20px; border-left: none; border-bottom: none; }
+        .cm-bl { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+        .cm-br { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+
+        .section-badge {
+            position: absolute;
+            top: 180px;
+            left: 80px;
+            background: var(--accent);
+            color: var(--bg);
+            padding: 5px 15px;
+            font-family: 'Outfit';
+            font-weight: 800;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-radius: 4px;
+            z-index: 80;
+        }
+
+        /* Ambient Effects */
+        .v14-glow {
+            position: absolute;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+            filter: blur(100px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Custom Visual Placeholder */
+        #v14-visual-target { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
 
     </style>
 </head>
-<body class="layout-split">
-    <div class="ambient-glow glow-tr"></div>
-    <div class="ambient-glow glow-bl"></div>
+<body>
+    <div class="v14-glow" style="top: -200px; left: -200px;"></div>
+    
+    <div class="corner-marker cm-tl"></div>
+    <div class="corner-marker cm-tr"></div>
+    <div class="corner-marker cm-bl"></div>
+    <div class="corner-marker cm-br"></div>
 
-    <div class="slide-container" id="slide">
+    <div class="section-badge" id="v14-section-badge">STRAT-CORE</div>
+
+    <div class="v14-container">
         <!-- HEADER -->
-        <div class="slide-header" id="header">
-            <div style="max-width: 1200px;">
-                <p class="slide-subtitle" id="header_subtitle">STRATEGIC ANALYSIS</p>
-                <h1 class="slide-title" id="header_title">Slide Title</h1>
+        <header class="v14-header">
+            <div class="v14-title-group">
+                <p id="v14-subtitle" class="v14-subtitle">STRATEGIC GROWTH ANALYSIS</p>
+                <h1 id="v14-title" class="v14-title">Executive Summary</h1>
             </div>
-            <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end;">
-                <img id="logo-img" src="" style="height: 70px; display: none; margin-bottom: 10px;">
-                <div id="logo-text">
-                    <p style="color: var(--accent); font-weight: 800; font-size: 26px; letter-spacing: 2px;">TRAFFIC RADIUS</p>
-                    <p style="font-size: 14px; color: #AAA; letter-spacing: 1px;">STRATEGY ARCHITECT</p>
-                </div>
+            <div style="text-align: right;">
+                <p style="color: var(--accent); font-weight: 800; font-size: 24px; letter-spacing: 2px;">TRAFFIC RADIUS</p>
+                <p style="font-size: 14px; color: rgba(255,255,255,0.4); letter-spacing: 1px;">STRATEGY ENGINE v14.0</p>
             </div>
-        </div>
+        </header>
 
-        <!-- CONTENT -->
-        <div class="content-grid" id="content-grid">
-            <!-- Center Content (Title Mode) -->
-            <div id="title-layout-center" style="display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding-bottom: 50px;">
-                <h1 class="big-title-h1" id="big-title">PHASE 1: ACTIVATION</h1>
-                <p class="big-subtitle-p" id="big-subtitle">Establishing The Authority Foundation</p>
+        <!-- VISUAL CONTENT (FULL WIDTH) -->
+        <main class="v14-visual-area">
+            <div id="v14-visual-target">
+                <!-- SVG Frameworks injected here -->
             </div>
 
-            <!-- Standard Sections -->
-            <div class="text-section" id="text-section">
-                <ul class="bullet-list" id="bullets"></ul>
-                <div class="impact-quote" id="quote"></div>
+            <div id="v14-takeaway-container" class="v14-takeaway">
+                <p class="v14-takeaway-label">Master Takeaway</p>
+                <p id="v14-takeaway" class="v14-takeaway-text">Establishing a dominant organic foundation is the prerequisite for scaling AI-driven visibility.</p>
             </div>
-            
-        </div>
-        
-        <div id="visual_content">
-            <!-- Glassmorphic Header for V9 -->
-            <div class="v9-header">
-                <div id="v9-top-title" class="v9-title">STRATEGIC INSIGHT</div>
-                <div style="color: var(--accent); font-weight: 800; font-size: 18px; letter-spacing: 5px;">V9.1 HYBRID PIPELINE</div>
-            </div>
-
-            <!-- V9 Component Injected Here - Centered Container -->
-            <div id="v9-component-target" style="flex: 1; display: flex; align-items: center; justify-content: center; width: 100%;"></div>
-
-            <!-- Narrative Box for Strategy Text -->
-            <div id="narrative-box" class="narrative-box" style="display: none;">
-                <p id="v9-subtitle" class="narrative-subtitle"></p>
-                <ul id="v9-bullets" class="narrative-bullets"></ul>
-            </div>
-        </div>
+        </main>
 
         <!-- FOOTER -->
-        <div class="slide-footer">
-            <div style="display: flex; gap: 30px;">
-                <p>CONFIDENTIAL STRATEGY</p>
-                <p style="color: var(--gold); border-left: 1px solid rgba(255,255,255,0.2); padding-left: 30px;">© 2026 TRAFFIC RADIUS</p>
+        <footer class="v14-footer">
+            <div style="display: flex; gap: 40px;">
+                <p>CONFIDENTIAL BUSINESS STRATEGY</p>
+                <p style="color: var(--gold); border-left: 1px solid var(--glass-border); padding-left: 40px;">© 2026 RADIUS AI</p>
             </div>
-            <p id="slide-num">SLIDE 01 OF 15</p>
-        </div>
+            <p id="v14-slide-num">SLIDE 01 OF 15</p>
+        </footer>
     </div>
 
     <script>
-        // V9 COMPONENT ROUTER
         window.loadComponent = function(htmlContent, slideData) {
-            const container = document.getElementById('visual_content');
-            // Do NOT wipe container.innerHTML here, as it contains our sync targets
-            
-            // If v9 is active, hide default header and breakout of layout
-            document.body.classList.add('v9-active');
-            ['header', 'header_section', 'bullets_container', 'bullets_container', 'text-section'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.style.display = 'none';
-            });
-
-            // v9 Polish: Hide v9 header on title slides
-            const v9Header = document.querySelector('.v9-header');
-            if (v9Header) {
-                v9Header.style.display = (slideData.archetype === 'title_v9') ? 'none' : 'flex';
-            }
-
             if (!slideData) return;
 
-            // 1. Map top-level slide properties (title, subtitle, etc)
-            const mappings = {
-                'title': ['title', 'top_title', 'v9-top-title'],
-                'subtitle': ['subtitle', 'top_subtitle', 'v9-subtitle']
-            };
-
-            Object.keys(mappings).forEach(key => {
-                if (slideData[key]) {
-                    mappings[key].forEach(targetId => {
-                        const el = document.getElementById(targetId);
-                        if (el) el.innerHTML = slideData[key];
-                    });
-                }
-            });
-
-            // 2. Map visual_data to component target
-            const componentTarget = container.querySelector('#v9-component-target');
-            if (componentTarget) {
-                componentTarget.innerHTML = htmlContent;
-            } else {
-                container.innerHTML = htmlContent; // Fallback
+            // 1. Text Mapping
+            if (slideData.title) document.getElementById('v14-title').innerHTML = slideData.title;
+            if (slideData.subtitle) document.getElementById('v14-subtitle').innerHTML = slideData.subtitle;
+            
+            // 2. Takeaway Mapping
+            if (slideData.takeaway) {
+                document.getElementById('v14-takeaway').innerHTML = slideData.takeaway;
             }
 
-            // 3. Map Narrative Text (Subtitle/Bullets)
-            const narrativeBox = document.getElementById('narrative-box');
-            const v9subtitle = document.getElementById('v9-subtitle');
-            const v9bullets = document.getElementById('v9-bullets');
+            // 3. Visual Content Injection
+            document.getElementById('v14-visual-target').innerHTML = htmlContent;
 
-            if (slideData.subtitle || (slideData.bullets && slideData.bullets.length > 0)) {
-                narrativeBox.style.display = 'flex';
-                if (v9subtitle) v9subtitle.innerHTML = slideData.subtitle || '';
-                
-                if (v9bullets && slideData.bullets) {
-                    v9bullets.innerHTML = slideData.bullets
-                        .map(b => `<li class="narrative-item"><div class="narrative-dot"></div>${b}</li>`)
-                        .join('');
-                }
-            }
-
-            // 4. Map visual_data properties
+            // 4. Visual Data Mapping (Recursive)
             const vd = slideData.visual_data;
             if (vd) {
                 if (Array.isArray(vd)) {
-                    // Handle list data (common for metrics/charts)
-                    vd.forEach((val, idx) => {
-                        const id = idx + 1;
-                        const valEl = container.querySelector(`#val${id}`);
-                        if (valEl) valEl.innerHTML = val;
-                        
-                        // Smart Labels for audit metrics if not provided
-                        const lblEl = container.querySelector(`#lbl${id}`);
-                        if (lblEl && (lblEl.innerHTML === 'Label' || lblEl.innerHTML === '0 LABEL')) {
-                            const labels = ['SEO Score', 'GEO Visibility', 'AEO Answer Rate', 'Trust Flow', 'Authority'];
-                            lblEl.innerHTML = labels[idx] || `Metric ${id}`;
-                        }
-                    });
-                } else if (typeof vd === 'object') {
-                    // Handle dictionary data
-                    Object.keys(vd).forEach(key => {
-                        const el = container.querySelector(`#${key}`);
-                        if (el) {
-                            if (key.includes('bar') || key.includes('progress')) {
-                                el.style.width = vd[key];
-                            } else if (key.includes('color')) {
-                                el.style.color = vd[key];
-                            } else {
-                                el.innerHTML = vd[key];
-                            }
-                        }
+                    vd.forEach((val, i) => {
+                        const el = document.getElementById(`val${i+1}`);
+                        if (el) el.innerHTML = val;
+                        const bar = document.getElementById(`bar${i+1}`);
+                        if (bar) bar.style.width = (typeof val === 'number' ? val : parseInt(val)) + '%';
                     });
                 }
             }
-        };
-
-        // Legacy Support for Radar (V8 compatibility)
-        window.renderDiagram = function(type, data) {
-             // If v9 archetype didn't fire, we can still use legacy logic if needed
-             // But for v9, we should transition to dedicated components
         };
     </script>
 </body>

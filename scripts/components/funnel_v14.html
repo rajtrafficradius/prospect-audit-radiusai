@@ -1,0 +1,95 @@
+<style>
+    .v14-funnel-container {
+        width: 1000px;
+        height: 700px;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .funnel-step {
+        width: var(--w);
+        height: 140px;
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(90deg, rgba(0, 204, 255, 0.1) 0%, rgba(0, 204, 255, 0.2) 50%, rgba(0, 204, 255, 0.1) 100%);
+        border: 1px solid rgba(0, 204, 255, 0.3);
+        clip-path: polygon(0% 0%, 100% 0%, 90% 100%, 10% 100%);
+        transition: all 0.5s ease;
+    }
+
+    .funnel-step::after {
+        content: '';
+        position: absolute;
+        bottom: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 40px;
+        background: var(--accent);
+        clip-path: polygon(100% 0%, 0% 0%, 50% 100%);
+        opacity: 0.6;
+    }
+
+    .funnel-step:last-child::after { display: none; }
+
+    .step-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .step-label {
+        font-family: 'Outfit';
+        font-size: 32px;
+        font-weight: 800;
+        color: #FFF;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    .step-desc {
+        font-size: 18px;
+        color: var(--accent);
+        font-weight: 600;
+        letter-spacing: 1px;
+    }
+
+    .funnel-step:nth-child(1) { --w: 100%; }
+    .funnel-step:nth-child(2) { --w: 80%; }
+    .funnel-step:nth-child(3) { --w: 60%; }
+    .funnel-step:nth-child(4) { --w: 40%; background: linear-gradient(90deg, rgba(0, 204, 255, 0.3) 0%, rgba(0, 204, 255, 0.5) 50%, rgba(0, 204, 255, 0.3) 100%); clip-path: polygon(0% 0%, 100% 0%, 50% 100%, 50% 100%); }
+
+</style>
+
+<div class="v14-funnel-container">
+    <div class="funnel-step">
+        <div class="step-content">
+            <p id="val1" class="step-label">AWARENESS</p>
+            <p class="step-desc">Search Intent Capture</p>
+        </div>
+    </div>
+    <div class="funnel-step">
+        <div class="step-content">
+            <p id="val2" class="step-label">CONSIDERATION</p>
+            <p class="step-desc">AI Data Source Inclusion</p>
+        </div>
+    </div>
+    <div class="funnel-step">
+        <div class="step-content">
+            <p id="val3" class="step-label">CITATIONS</p>
+            <p class="step-desc">Authority Validation</p>
+        </div>
+    </div>
+    <div class="funnel-step" style="height: 100px;">
+        <div class="step-content" style="padding-top: 20px;">
+            <p id="val4" class="step-label">CONVERSION</p>
+            <p class="step-desc">Direct Business Impact</p>
+        </div>
+    </div>
+</div>

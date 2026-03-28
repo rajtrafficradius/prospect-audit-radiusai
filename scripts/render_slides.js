@@ -59,86 +59,33 @@ async function renderSlides(sessionDir, outputDir) {
 
         // Inject data via DOM manipulation
         await page.evaluate(({ slide, index, totalSlides, logoB64 }) => {
-            // 1. Layout Selection & Visibility
-            const layout = slide.layout || 'split';
-            document.body.className = `layout-${layout}`;
-            
-            const titleEl = document.getElementById('title');
-            const subtitleEl = document.getElementById('subtitle');
-            const bigTitleEl = document.getElementById('big-title');
-            const bigSubtitleEl = document.getElementById('big-subtitle');
-            const titleLayoutCenter = document.getElementById('title-layout-center');
-            const quoteEl = document.getElementById('quote');
-            const slideNumEl = document.getElementById('slide-num');
-            const bulletList = document.getElementById('bullets');
-            const logoImg = document.getElementById('logo-img');
-            const logoText = document.getElementById('logo-text');
-            const visualSection = document.getElementById('visual-section');
-            const footer = document.querySelector('.slide-footer');
+            // 1. Text Mapping (Title, Subtitle, Slide Num)
+            const titleEl = document.getElementById('v14-title') || document.getElementById('title');
+            const subtitleEl = document.getElementById('v14-subtitle') || document.getElementById('subtitle');
+            const slideNumEl = document.getElementById('v14-slide-num') || document.getElementById('slide-num');
 
-            // Toggle Title Layout Container
-            if (titleLayoutCenter) {
-                titleLayoutCenter.style.display = (layout === 'title') ? 'flex' : 'none';
-            }
-            if (footer) {
-                footer.style.display = (layout === 'title') ? 'none' : 'flex';
-            }
-
-            // Header/Text injection
             if (titleEl) titleEl.innerText = slide.title || '';
             if (subtitleEl) subtitleEl.innerText = slide.subtitle || '';
-            if (bigTitleEl) bigTitleEl.innerText = slide.title || '';
-            if (bigSubtitleEl) bigSubtitleEl.innerText = slide.subtitle || '';
-            if (slideNumEl) slideNumEl.innerText = `SLIDE ${String(index + 1).padStart(2, '0')} OF ${totalSlides}`;
+            if (slideNumEl) {
+                const currentNum = String(index + 1).padStart(2, '0');
+                const totalNum = String(totalSlides).padStart(2, '0');
+                slideNumEl.innerText = `SLIDE ${currentNum} OF ${totalNum}`;
+            }
 
-            // Logo Injection
+            // 2. Logo Injection (Legacy & V14)
+            const logoImg = document.getElementById('logo-img');
             if (logoB64 && logoImg) {
                 logoImg.src = `data:image/png;base64,${logoB64}`;
                 logoImg.style.display = 'block';
-                if (logoText) logoText.style.display = 'none';
             }
 
-            // Bullets Injection with Auto-Scaling
-            if (bulletList) {
-                bulletList.innerHTML = '';
-                const bullets = (slide.bullets || []);
-                bullets.forEach(b => {
-                    const li = document.createElement('li');
-                    li.className = 'bullet-item';
-                    li.innerHTML = `<div class="bullet-icon"></div><span>${b}</span>`;
-                    bulletList.appendChild(li);
-                });
-                if (bullets.length === 0) {
-                    bulletList.style.display = 'none';
-                } else if (bullets.length > 6) {
-                    bulletList.style.fontSize = '24px'; // Scale down for many bullets
-                    bulletList.style.gap = '15px';
-                } else {
-                    bulletList.style.fontSize = '30px';
-                    bulletList.style.gap = '25px';
-                }
+            // 3. Bullets (Optional - Template may not show them)
+            const bulletList = document.getElementById('v14-bullets') || document.getElementById('bullets');
+            if (bulletList && slide.bullets) {
+                bulletList.innerHTML = slide.bullets
+                    .map(b => `<li class="bullet-item"><div class="bullet-dot"></div><span>${b}</span></li>`)
+                    .join('');
             }
-
-            // Quote
-            if (quoteEl) {
-                if (slide.quote) {
-                    quoteEl.innerHTML = `<strong>“</strong>${slide.quote}<strong>”</strong>`;
-                    quoteEl.classList.remove('empty');
-                } else {
-                    quoteEl.innerHTML = '';
-                    quoteEl.classList.add('empty');
-                }
-            }
-
-            // LEGACY V8 SUPPORT (V9 component injection is handled outside this evaluate block)
-            if (typeof window.renderDiagram === 'function') {
-                if (slide.visual_type && slide.visual_data) {
-                    window.renderDiagram(slide.visual_type, slide.visual_data);
-                } else if (slide.visual) {
-                    window.renderDiagram('image', slide.visual);
-                }
-            }
-
         }, { slide, index: i, totalSlides: slidesData.length, logoB64: logoBase64 });
 
         // V9: Component Injection (Must happen after setContent and main evaluate)
