@@ -80,10 +80,10 @@ async function renderSlides(sessionDir, outputDir) {
             }
 
             // 3. Bullets (Optional - Template may not show them)
-            const bulletList = document.getElementById('v14-bullets') || document.getElementById('bullets');
+            const bulletList = document.getElementById('v15-bullets') || document.getElementById('v14-bullets') || document.getElementById('bullets');
             if (bulletList && slide.bullets) {
                 bulletList.innerHTML = slide.bullets
-                    .map(b => `<li class="bullet-item"><div class="bullet-dot"></div><span>${b}</span></li>`)
+                    .map(b => `<div class="v15-insight-card"><div class="v15-card-dot"></div><div class="v15-card-text">${b}</div></div>`)
                     .join('');
             }
         }, { slide, index: i, totalSlides: slidesData.length, logoB64: logoBase64 });

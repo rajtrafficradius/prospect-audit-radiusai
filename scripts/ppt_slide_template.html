@@ -34,151 +34,112 @@
             background-size: 40px 40px;
         }
 
-        /* V14 Layout Structure */
-        .v14-container {
+        /* V15 Managed Flex Stack */
+        .v15-container {
             width: 100%;
             height: 100%;
-            display: grid;
-            grid-template-rows: 160px 1fr 100px;
+            display: flex;
+            flex-direction: column;
             padding: 0;
         }
 
-        /* Global Header (Span Full) */
-        .v14-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 40px 80px;
-            border-bottom: 1px solid var(--glass-border);
-            z-index: 100;
-        }
-
-        .v14-title-group { display: flex; flex-direction: column; }
-        .v14-subtitle { font-family: 'Outfit'; font-size: 24px; color: var(--accent); letter-spacing: 4px; text-transform: uppercase; font-weight: 600; }
-        .v14-title { font-family: 'Outfit'; font-size: 72px; font-weight: 800; letter-spacing: -2px; text-transform: uppercase; line-height: 1.1; }
-
-        /* Full Width Visual Area */
-        .v14-visual-area {
-            position: relative;
-            padding: 40px 80px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        /* Strategic Takeaway Bar - Centered at Bottom */
-        .v14-takeaway {
-            position: absolute;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            max-width: 1200px;
-            padding: 25px 40px;
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid var(--accent);
-            border-radius: 20px;
-            backdrop-filter: blur(20px);
-            z-index: 150;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            gap: 30px;
-        }
-        .v14-takeaway-label { 
-            font-size: 14px; 
-            color: var(--accent); 
-            font-weight: 800; 
-            text-transform: uppercase; 
-            white-space: nowrap;
-            padding-right: 30px;
-            border-right: 1px solid var(--glass-border);
-        }
-        .v14-takeaway-text { font-size: 24px; font-weight: 600; color: #FFF; line-height: 1.4; font-style: italic; text-align: left; flex: 1; }
-
-        /* Global Footer */
-        .v14-footer {
+        /* Global Header */
+        .v15-header {
+            height: 160px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 0 80px;
-            font-size: 18px;
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .v15-title-group { display: flex; flex-direction: column; }
+        .v15-subtitle { font-family: 'Outfit'; font-size: 24px; color: var(--accent); letter-spacing: 4px; text-transform: uppercase; font-weight: 600; }
+        .v15-title { font-family: 'Outfit'; font-size: 72px; font-weight: 800; letter-spacing: -2px; text-transform: uppercase; line-height: 1.1; }
+
+        /* Main Content Area (Visual + Insights) */
+        .v15-content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 80px 100px 80px; /* Large bottom padding for takeaway */
+            gap: 15px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Perfectly Centered Visual Target */
+        #v15-visual-target { 
+            flex: 1.2; /* Give visual more weight */
+            width: 100%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 10;
+            min-height: 300px;
+        }
+
+        /* The 8-Bullet Insight Matrix */
+        .v15-insight-matrix {
+            width: 100%;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, auto);
+            gap: 10px;
+            z-index: 20;
+            flex-shrink: 0;
+        }
+
+        .v15-insight-card {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(0, 204, 255, 0.1);
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            backdrop-filter: blur(15px);
+            min-height: 70px; /* Reduced to save space */
+        }
+
+        .v15-card-dot { width: 5px; height: 5px; background: var(--accent); border-radius: 50%; margin-top: 7px; flex-shrink: 0; box-shadow: 0 0 8px var(--accent); }
+        .v15-card-text { font-size: 14px; color: rgba(255, 255, 255, 0.85); line-height: 1.2; font-weight: 400; }
+
+        /* Takeaway Bar (Absolute within content area, but clear of grid) */
+        .v15-takeaway {
+            position: absolute;
+            bottom: 20px;
+            left: 80px;
+            right: 80px;
+            padding: 15px 30px;
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
+            backdrop-filter: blur(20px);
+            z-index: 150;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+        .v15-takeaway-label { font-size: 11px; color: var(--accent); font-weight: 800; text-transform: uppercase; white-space: nowrap; padding-right: 15px; border-right: 1px solid var(--glass-border); }
+        .v15-takeaway-text { font-size: 18px; font-weight: 600; color: #FFF; line-height: 1.2; font-style: italic; }
+
+        /* Footer */
+        .v15-footer {
+            height: 80px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 80px;
+            font-size: 16px;
             color: rgba(255, 255, 255, 0.4);
             letter-spacing: 2px;
             border-top: 1px solid var(--glass-border);
+            flex-shrink: 0;
         }
-
-        /* Decorative Corner Markers */
-        .corner-marker {
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            border: 2px solid var(--accent);
-            opacity: 0.3;
-            z-index: 100;
-        }
-        .cm-tl { top: 20px; left: 20px; border-right: none; border-bottom: none; }
-        .cm-tr { top: 20px; right: 20px; border-left: none; border-bottom: none; }
-        .cm-bl { bottom: 20px; left: 20px; border-right: none; border-top: none; }
-        .cm-br { bottom: 20px; right: 20px; border-left: none; border-top: none; }
-
-        .section-badge {
-            position: absolute;
-            top: 180px;
-            left: 80px;
-            background: var(--accent);
-            color: var(--bg);
-            padding: 5px 15px;
-            font-family: 'Outfit';
-            font-weight: 800;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            border-radius: 4px;
-            z-index: 80;
-        }
-
-        /* Ambient Effects */
-        .v14-glow {
-            position: absolute;
-            width: 800px;
-            height: 800px;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-            filter: blur(100px);
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* Custom Visual Placeholder */
-        #v14-visual-target { width: 100%; height: 65%; display: flex; align-items: center; justify-content: center; z-index: 10; margin-top: -60px; }
-
-        /* Annotation Grid (The "Anti-Skeletal" fix) */
-        .v14-content-grid {
-            position: absolute;
-            bottom: 180px;
-            width: 85%;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            z-index: 20;
-        }
-
-        .v14-content-card {
-            background: rgba(15, 23, 42, 0.4);
-            border: 1px solid rgba(0, 204, 255, 0.1);
-            padding: 15px 20px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            backdrop-filter: blur(15px);
-        }
-
-        .v14-card-dot { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 8px var(--accent); }
-        .v14-card-text { font-size: 18px; color: rgba(255, 255, 255, 0.9); line-height: 1.3; font-weight: 400; }
-
     </style>
 </head>
 <body>
@@ -191,38 +152,34 @@
 
     <div class="section-badge" id="v14-section-badge">STRAT-CORE</div>
 
-    <div class="v14-container">
-        <!-- HEADER -->
-        <header class="v14-header">
-            <div class="v14-title-group">
-                <p id="v14-subtitle" class="v14-subtitle">STRATEGIC GROWTH ANALYSIS</p>
-                <h1 id="v14-title" class="v14-title">Executive Summary</h1>
+    <div class="v15-container">
+        <header class="v15-header">
+            <div class="v15-title-group">
+                <p id="v14-subtitle" class="v15-subtitle">STRATEGIC GROWTH ANALYSIS</p>
+                <h1 id="v14-title" class="v15-title">Executive Summary</h1>
             </div>
             <div style="text-align: right;">
                 <p style="color: var(--accent); font-weight: 800; font-size: 24px; letter-spacing: 2px;">TRAFFIC RADIUS</p>
-                <p style="font-size: 14px; color: rgba(255,255,255,0.4); letter-spacing: 1px;">STRATEGY ENGINE v14.0</p>
+                <p style="font-size: 14px; color: rgba(255,255,255,0.4); letter-spacing: 1px;">STRATEGY ENGINE v15.0</p>
             </div>
         </header>
 
-        <!-- VISUAL CONTENT (FULL WIDTH) -->
-        <main class="v14-visual-area">
-            <div id="v14-visual-target">
-                <!-- SVG Frameworks injected here -->
+        <main class="v15-content-area">
+            <div id="v15-visual-target">
+                <!-- SVG Frameworks -->
             </div>
 
-            <!-- ANNOTATION GRID -->
-            <div id="v14-bullets" class="v14-content-grid">
-                <!-- Bullets injected here as cards -->
+            <div id="v15-bullets" class="v15-insight-matrix">
+                <!-- 8 Bullets -->
             </div>
 
-            <div id="v14-takeaway-container" class="v14-takeaway">
-                <p class="v14-takeaway-label">Master Takeaway</p>
-                <p id="v14-takeaway" class="v14-takeaway-text">Establishing a dominant organic foundation is the prerequisite for scaling AI-driven visibility.</p>
+            <div class="v15-takeaway">
+                <p class="v15-takeaway-label">Master Takeaway</p>
+                <p id="v14-takeaway" class="v15-takeaway-text"></p>
             </div>
         </main>
 
-        <!-- FOOTER -->
-        <footer class="v14-footer">
+        <footer class="v15-footer">
             <div style="display: flex; gap: 40px;">
                 <p>CONFIDENTIAL BUSINESS STRATEGY</p>
                 <p style="color: var(--gold); border-left: 1px solid var(--glass-border); padding-left: 40px;">© 2026 RADIUS AI</p>
@@ -244,32 +201,40 @@
                 document.getElementById('v14-takeaway').innerHTML = slideData.takeaway;
             }
 
-            // 3. Bullets Mapping (The "Anti-Skeletal" injection)
-            const bulletContainer = document.getElementById('v14-bullets');
+            // 3. Bullets Mapping (The v15 Insight Matrix - 8 bullets)
+            const bulletContainer = document.getElementById('v15-bullets');
             if (bulletContainer && slideData.bullets) {
                 bulletContainer.innerHTML = slideData.bullets
                     .map(b => `
-                        <div class="v14-content-card">
-                            <div class="v14-card-dot"></div>
-                            <div class="v14-card-text">${b}</div>
+                        <div class="v15-insight-card">
+                            <div class="v15-card-dot"></div>
+                            <div class="v15-card-text">${b}</div>
                         </div>
                     `).join('');
             }
 
             // 4. Visual Content Injection
-            document.getElementById('v14-visual-target').innerHTML = htmlContent;
+            document.getElementById('v15-visual-target').innerHTML = htmlContent;
 
-            // 5. Visual Data Mapping (Recursive)
+            // 5. Visual Data Mapping (Enhanced for v15.1)
             const vd = slideData.visual_data;
-            if (vd) {
-                if (Array.isArray(vd)) {
-                    vd.forEach((val, i) => {
-                        const el = document.getElementById(`val${i+1}`);
-                        if (el) el.innerHTML = val;
-                        const bar = document.getElementById(`bar${i+1}`);
-                        if (bar) bar.style.width = (typeof val === 'number' ? val : parseInt(val)) + '%';
-                    });
-                }
+            if (vd && Array.isArray(vd)) {
+                vd.forEach((item, i) => {
+                    const idx = i + 1;
+                    const valEl = document.getElementById(`val${idx}`);
+                    const lblEl = document.getElementById(`lbl${idx}`);
+                    const barEl = document.getElementById(`bar${idx}`);
+
+                    if (typeof item === 'string' && item.includes(':')) {
+                        const [label, value] = item.split(':').map(s => s.trim());
+                        if (lblEl) lblEl.innerHTML = label;
+                        if (valEl) valEl.innerHTML = value;
+                        if (barEl) barEl.style.width = (parseInt(value) || 0) + '%';
+                    } else {
+                        if (valEl) valEl.innerHTML = item;
+                        if (barEl) barEl.style.width = (typeof item === 'number' ? item : parseInt(item) || 0) + '%';
+                    }
+                });
             }
         };
     </script>

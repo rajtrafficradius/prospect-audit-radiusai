@@ -348,3 +348,88 @@ INFO:     Finished server process [36283]
 INFO:     Started server process [62494]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'scripts/synthesize_ppt_json.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [62494]
+INFO:     Started server process [65950]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'scripts/synthesize_ppt_json.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [65950]
+INFO:     Started server process [65965]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'scripts/synthesize_ppt_json.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [65965]
+INFO:     Started server process [65973]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'src/archetypes.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [65973]
+INFO:     Started server process [66172]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'scripts/synthesize_ppt_json.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [66172]
+INFO:     Started server process [66561]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ [+] API Key Loaded: sk-proj-Gm...wv4A (Length: 164)
+INFO:     127.0.0.1:61888 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61888 - "GET /static/style.css HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61892 - "GET /static/app.js HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61888 - "GET /static/logo.png HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61888 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61899 - "POST /api/start-audit HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61899 - "GET /api/stream-logs/337e67c2-0ee2-4cdb-88b9-80585e027922 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62104 - "GET /api/status/337e67c2-0ee2-4cdb-88b9-80585e027922 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62104 - "GET /api/history HTTP/1.1" 200 OK
+ [+] Serving download: /Users/vysakhvijayan/prospect-audit-strategy-seo-geo-aeo (1)/src/../output/sessions/337e67c2-0ee2-4cdb-88b9-80585e027922/deliverables/Master_Presentation.pptx
+INFO:     127.0.0.1:62104 - "GET /api/download/337e67c2-0ee2-4cdb-88b9-80585e027922/pptx HTTP/1.1" 200 OK
+ [+] Serving download: /Users/vysakhvijayan/prospect-audit-strategy-seo-geo-aeo (1)/src/../output/sessions/337e67c2-0ee2-4cdb-88b9-80585e027922/deliverables/Strategy_Document.docx
+INFO:     127.0.0.1:62172 - "GET /api/download/337e67c2-0ee2-4cdb-88b9-80585e027922/docx HTTP/1.1" 200 OK
+ [+] Serving download: /Users/vysakhvijayan/prospect-audit-strategy-seo-geo-aeo (1)/src/../output/sessions/337e67c2-0ee2-4cdb-88b9-80585e027922/deliverables/12_Month_Action_Plan.xlsx
+INFO:     127.0.0.1:62174 - "GET /api/download/337e67c2-0ee2-4cdb-88b9-80585e027922/xlsx HTTP/1.1" 200 OK
+WARNING:  StatReload detected changes in 'scripts/synthesize_ppt_json.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [66561]
+INFO:     Started server process [85661]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+ [+] API Key Loaded: sk-proj-Gm...wv4A (Length: 164)
+INFO:     127.0.0.1:63114 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63114 - "GET /static/style.css HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:63116 - "GET /static/logo.png HTTP/1.1" 304 Not Modified
+INFO:     127.0.0.1:63118 - "GET /static/app.js HTTP/1.1" 304 Not Modified
+WARNING:  StatReload detected changes in 'scripts/synthesize_ppt_json.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [85661]
+INFO:     Started server process [88127]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+WARNING:  StatReload detected changes in 'scripts/synthesize_ppt_json.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [88127]
+INFO:     Started server process [88760]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.

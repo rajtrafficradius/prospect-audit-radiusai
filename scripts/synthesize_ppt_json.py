@@ -16,7 +16,7 @@ from src.archetypes import get_archetype
 class Slide(BaseModel):
     title: str
     subtitle: Optional[str] = ""
-    bullets: List[str] = Field(default_factory=list, description="Max 4 items, max 20 words each. High strategic value only.")
+    bullets: List[str] = Field(default_factory=list, description="EXACTLY 8 items, max 20 words each. High strategic density.")
     takeaway: str = Field(..., description="A bold, 1-sentence strategic takeaway.")
     quote: Optional[str] = ""
     visual_type: Optional[str] = Field(None, description="One of: 'radar', 'pyramid', 'funnel', 'architecture', 'comparison', 'matrix'")
@@ -48,21 +48,26 @@ def synthesize_ppt_json(session_dir, company_name):
     You are an elite Growth Architect at Traffic Radius. 
     Synthesize a 15-Slide EXECUTIVE STRATEGY for {company_name}.
     
-    TONAL & CONTENT RULES (CRITICAL):
-    1. EXECUTIVE DEPTH: Avoid generic filler. Every point must be a specific strategic insight.
-       - 'bullets': Max 4 points. Max 20 words per point. Each point should be a mini-strategy or specific finding.
-       - 'takeaway': One bold, high-impact sentence that summarizes the "So What?" of the slide.
+    V15 INFORMATION DENSITY RULES (CRITICAL):
+    1. ZERO FILLER: Every slide MUST have 8 distinct, punchy strategic highlights.
+       - 'bullets': EXACTLY 8 points. Max 20 words per point. 
+       - Content: Use technical terminology (LSEO, GEO Citations, Semantic Gaps, AEO schemas).
+       - 'takeaway': One bold, high-impact "Master Takeaway" that ties it all together.
     2. NARRATIVE FLOW: 
        - Cover/Hook → Challenge → Evidence (Audit) → Strategy (SEO/GEO/AEO) → ROI/Outcome.
     3. EXCLUSIVELY ORGANIC: 100% Organic strategy. Exclude all Paid/Ads/PPC.
+       - Cover/Hook → Challenge → Evidence (Audit) → Strategy (SEO/GEO/AEO) → ROI/Outcome.
+    3. EXCLUSIVELY ORGANIC: 100% Organic strategy. Exclude all Paid/Ads/PPC.
 
-    V14 VISUAL FRAMEWORKS:
+    V15 VISUAL FRAMEWORKS:
     Every slide (except title) MUST have a 'visual_type':
-    - 'funnel': [Awareness, Consideration, Answer, Conversion] (4 labels).
-    - 'architecture': [Foundation, Visibility, Authority] (3 layers).
-    - 'radar': [SEO, AEO, GEO, Trust, Speed] (5 scores 0-100).
-    - 'comparison': [Current State, Target State] (2 descriptive states).
-    - 'matrix': [Low Impact, High Noise, Strategic Core, Growth Lever, 2] (4 quad names + ActiveIndex).
+    - 'funnel': [Awareness: 90, Consideration: 70, Choice: 40, Conversion: 10] (Use Label: Value).
+    - 'architecture': [Foundation: Text, Visibility: Text, Authority: Text] (Use Label: Value).
+    - 'radar': [SEO: 85, AEO: 60, GEO: 75, Trust: 90, Speed: 40] (Use Label: Value).
+    - 'comparison': [Current: Weak, Target: Dominant] (Use Label: Value).
+    - 'matrix': [High Impact, Low Noise, Growth Lever, Strategic Core] (Use Label: Value).
+    
+    IMPORTANT: For 'visual_data', ALWAYS use the format 'Label: Value' to ensure correct mapping to component elements (lblX and valX).
     
     --- DATA CONTEXT ---
     BUSINESS: {json.dumps(ba, indent=2)}
