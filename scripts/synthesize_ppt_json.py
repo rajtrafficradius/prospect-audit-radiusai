@@ -16,7 +16,7 @@ from src.archetypes import get_archetype
 class Slide(BaseModel):
     title: str
     subtitle: Optional[str] = ""
-    bullets: List[str] = Field(default_factory=list, description="Max 4 items, max 15 words each.")
+    bullets: List[str] = Field(default_factory=list, description="Max 4 items, max 20 words each. High strategic value only.")
     takeaway: str = Field(..., description="A bold, 1-sentence strategic takeaway.")
     quote: Optional[str] = ""
     visual_type: Optional[str] = Field(None, description="One of: 'radar', 'pyramid', 'funnel', 'architecture', 'comparison', 'matrix'")
@@ -49,8 +49,8 @@ def synthesize_ppt_json(session_dir, company_name):
     Synthesize a 15-Slide EXECUTIVE STRATEGY for {company_name}.
     
     TONAL & CONTENT RULES (CRITICAL):
-    1. EXECUTIVE BREVITY: This is for a CEO. No paragraphs.
-       - 'bullets': Max 4 points. Max 15 words per point. Use punchy, execution-style language.
+    1. EXECUTIVE DEPTH: Avoid generic filler. Every point must be a specific strategic insight.
+       - 'bullets': Max 4 points. Max 20 words per point. Each point should be a mini-strategy or specific finding.
        - 'takeaway': One bold, high-impact sentence that summarizes the "So What?" of the slide.
     2. NARRATIVE FLOW: 
        - Cover/Hook → Challenge → Evidence (Audit) → Strategy (SEO/GEO/AEO) → ROI/Outcome.
