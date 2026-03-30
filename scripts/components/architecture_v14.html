@@ -1,13 +1,13 @@
 <style>
     .v14-arch-container {
-        width: 1000px;
-        height: 700px;
+        width: 1400px; /* Increased from 1000px */
+        height: 750px; /* Increased from 700px */
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
-        gap: 20px;
-        perspective: 1000px;
+        gap: 30px; /* Increased from 20px */
+        perspective: 1200px;
     }
 
     .arch-layer {
@@ -64,9 +64,9 @@
         border: 1px solid rgba(0, 204, 255, 0.2);
     }
 
-    .arch-layer:nth-child(1) { --w: 700px; z-index: 3; background: linear-gradient(135deg, rgba(0, 204, 255, 0.2) 0%, rgba(15, 23, 42, 0.8) 100%); }
-    .arch-layer:nth-child(2) { --w: 850px; z-index: 2; margin-top: -40px; }
-    .arch-layer:nth-child(3) { --w: 1000px; z-index: 1; margin-top: -40px; }
+    .arch-layer:nth-child(1) { --w: 1000px; z-index: 3; background: linear-gradient(135deg, rgba(0, 204, 255, 0.2) 0%, rgba(15, 23, 42, 0.8) 100%); }
+    .arch-layer:nth-child(2) { --w: 1200px; z-index: 2; margin-top: -50px; }
+    .arch-layer:nth-child(3) { --w: 1400px; z-index: 1; margin-top: -50px; }
 
 </style>
 

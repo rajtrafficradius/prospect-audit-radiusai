@@ -129,16 +129,29 @@
 
         /* Footer */
         .v15-footer {
-            height: 80px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 80px;
-            font-size: 16px;
-            color: rgba(255, 255, 255, 0.4);
-            letter-spacing: 2px;
             border-top: 1px solid var(--glass-border);
             flex-shrink: 0;
+        }
+
+        /* Brand Identity */
+        .v15-logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+        }
+        #logo-img {
+            height: 50px;
+            width: auto;
+            display: none; /* Shown via JS if exists */
+            filter: brightness(0) invert(1) drop-shadow(0 0 10px rgba(255,255,255,0.3));
+        }
+        .v15-brand-backup {
+            color: #FFF;
+            font-weight: 800;
+            font-size: 24px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
     </style>
 </head>
@@ -158,9 +171,10 @@
                 <p id="v14-subtitle" class="v15-subtitle">STRATEGIC GROWTH ANALYSIS</p>
                 <h1 id="v14-title" class="v15-title">Executive Summary</h1>
             </div>
-            <div style="text-align: right;">
-                <p style="color: var(--accent); font-weight: 800; font-size: 24px; letter-spacing: 2px;">TRAFFIC RADIUS</p>
-                <p style="font-size: 14px; color: rgba(255,255,255,0.4); letter-spacing: 1px;">STRATEGY ENGINE v15.0</p>
+            <div class="v15-logo-container">
+                <img id="logo-img" src="" alt="Traffic Radius Logo">
+                <div id="brand-text-fallback" class="v15-brand-backup">TRAFFIC RADIUS</div>
+                <p style="font-size: 14px; color: rgba(255,255,255,0.4); letter-spacing: 1px;">STRATEGY ENGINE v15.6</p>
             </div>
         </header>
 
@@ -192,10 +206,22 @@
         window.loadComponent = function(htmlContent, slideData) {
             if (!slideData) return;
 
-            // 1. Text Mapping
+            // 0. Visual Content Injection (MUST HAPPEN FIRST for internal mapping)
+            document.getElementById('v15-visual-target').innerHTML = htmlContent;
+
+            // 1. Text Mapping (Global Header)
             if (slideData.title) document.getElementById('v14-title').innerHTML = slideData.title;
             if (slideData.subtitle) document.getElementById('v14-subtitle').innerHTML = slideData.subtitle;
             
+            // 1b. Internal Mapping (Component Title/Subtitle)
+            const visualTarget = document.getElementById('v15-visual-target');
+            if (visualTarget) {
+                const internalTitle = visualTarget.querySelector('#title');
+                const internalSubtitle = visualTarget.querySelector('#subtitle');
+                if (internalTitle && slideData.title) internalTitle.innerHTML = slideData.title;
+                if (internalSubtitle && slideData.subtitle) internalSubtitle.innerHTML = slideData.subtitle;
+            }
+
             // 2. Takeaway Mapping
             if (slideData.takeaway) {
                 document.getElementById('v14-takeaway').innerHTML = slideData.takeaway;
@@ -212,9 +238,6 @@
                         </div>
                     `).join('');
             }
-
-            // 4. Visual Content Injection
-            document.getElementById('v15-visual-target').innerHTML = htmlContent;
 
             // 5. Visual Data Mapping (Enhanced for v15.1)
             const vd = slideData.visual_data;
@@ -235,6 +258,18 @@
                         if (barEl) barEl.style.width = (typeof item === 'number' ? item : parseInt(item) || 0) + '%';
                     }
                 });
+            }
+            // 2. Logo / Brand Injection
+            const logoImg = document.getElementById('logo-img');
+            const fallbackText = document.getElementById('brand-text-fallback');
+            
+            // Note: logoB64 is passed from render_slides.js via evaluate
+            if (window.logoDataUri) {
+                if (logoImg) {
+                    logoImg.src = window.logoDataUri;
+                    logoImg.style.display = 'block';
+                }
+                if (fallbackText) fallbackText.style.display = 'none';
             }
         };
     </script>

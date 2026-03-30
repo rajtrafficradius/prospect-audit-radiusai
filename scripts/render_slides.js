@@ -73,10 +73,8 @@ async function renderSlides(sessionDir, outputDir) {
             }
 
             // 2. Logo Injection (Legacy & V14)
-            const logoImg = document.getElementById('logo-img');
-            if (logoB64 && logoImg) {
-                logoImg.src = `data:image/png;base64,${logoB64}`;
-                logoImg.style.display = 'block';
+            if (logoB64) {
+                window.logoDataUri = `data:image/png;base64,${logoB64}`;
             }
 
             // 3. Bullets (Optional - Template may not show them)
